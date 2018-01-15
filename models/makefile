@@ -9,7 +9,9 @@
 # /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
 #-----------------------------------------------------------------
 
-PROGRAMS = parabola
+PROGRAMS  = parabola
+PROGRAMS += parabola-bez
+
 CPPFLAGS = -std=c++14
 #-Wno-c++11-extensions
 
