@@ -42,13 +42,13 @@
 #include <cmath>
 #include <cassert>
 
-struct PointT {
+struct Point2D {
 	double x;
 	double y;
 };
 
-struct LineT {
-	LineT(double slope, double intercept) : m(slope), b(intercept) {}
+struct Line2D {
+	Line2D(double slope, double intercept) : m(slope), b(intercept) {}
 
 	double operator()(double t) {
 		double y = m * (t) + b;
@@ -79,7 +79,7 @@ struct ConicParabola {
 		} else {
 			b = focus.y + p;
 		}
-		LineT line(m, b);
+		Line2D line(m, b);
 		directrix = line;
 	}
 
@@ -111,21 +111,34 @@ struct ConicParabola {
 	double m;
 	double aCoeff;
 	double p;
-	PointT vertex;
-	PointT focus;
-	LineT directrix{0.0, 0.0};
+	Point2D vertex;
+	Point2D focus;
+	Line2D directrix{0.0, 0.0};
 };
 
-struct BezierControlPoints {
-	PointT B0;
-	PointT B1;
-	PointT B2;
+struct BezierControlPoints2D {
+	Point2D B0;
+	Point2D B1;
+	Point2D B2;
 };
 
-struct BezierParabola {
-	BezierParabola(ConicParabola parabola) : parabola(parabola) {}
+struct Axis2D {
+	Axis2D(Point2D min, Point2D max) : pMin(min), pMax(max) {}
+	Point2D pMin;
+	Point2D pMax;
+};
 
-	BezierControlPoints operator()(double minX, double maxX) {
+struct Axes2D {
+	Axes2D(Axis2D xAxis, Axis2D yAxis) : i(xAxis), j(yAxis) {}
+
+	Axis2D i;
+	Axis2D j;
+};
+
+struct BezierParabola2D {
+	BezierParabola2D(ConicParabola parabola) : parabola(parabola) {}
+
+	BezierControlPoints2D operator()(double minX, double maxX) {
 		// test minX < maxX
 
 		// left control point is just parabola endpoint on left
@@ -167,10 +180,17 @@ struct BezierParabola {
 	}
 
 	ConicParabola parabola;
-	BezierControlPoints bcp;
+	BezierControlPoints2D bcp;
 };
 
-std::ostream& operator<<(std::ostream& os, const BezierControlPoints& bcp) {
+struct GpuParabola2D {
+	GpuParabola2D(BezierParabola2D bezParabola, Axes2D axes) : bp(bezParabola), axes(axes) {};
+
+	BezierParabola2D bp;
+	Axes2D axes;
+};
+
+std::ostream& operator<<(std::ostream& os, const BezierControlPoints2D& bcp) {
 	os << "B0(" << bcp.B0.x << ", " << bcp.B0.y << ") ";
 	os << "B1(" << bcp.B1.x << ", " << bcp.B1.y << ") ";
 	os << "B2(" << bcp.B2.x << ", " << bcp.B2.y << ")";
@@ -183,7 +203,7 @@ const double ConeAngle60 = M_PI / 3.0;
 int main() {
 	double coneAngle = ConeAngle45;
 	ConicParabola parabola(coneAngle);
-	BezierParabola bezierParabola(parabola);
+	BezierParabola2D bezierParabola(parabola);
 
 	std::string banner("Conic Section Parabola with 2nd order Bezier Control Points");
 	std::cout << banner << std::endl;
@@ -210,7 +230,26 @@ int main() {
 	std::cout << "directrix @ vertex = " << parabola.directrix(parabola.vertex.x) << std::endl;
 	std::cout << std::endl;
 
-	BezierControlPoints parabolaCP = bezierParabola(minX, maxX);
+	BezierControlPoints2D parabolaCP = bezierParabola(minX, maxX);
 	std::cout << "2nd Order Bezier Control Points" << std::endl;
 	std::cout << parabolaCP << std::endl << std::endl;
+
+	Point2D pMinX;
+	pMinX.x = minX;
+	pMinX.y = 0.0;
+	Point2D pMaxX;
+	pMaxX.x = maxX;
+	pMaxX.y = 0.0;
+	Axis2D xAxis(pMinX, pMaxX);
+
+	Point2D pMinY;
+	pMinY.x = 0.0;
+	pMinY.y = -parabola(minX);
+	Point2D pMaxY;
+	pMaxY.x = 0.0;
+	pMaxY.y = parabola(minX);
+	Axis2D yAxis(pMinX, pMaxX);
+
+	Axes2D axes(xAxis, yAxis);
+	GpuParabola2D gpuParabola(bezierParabola, axes);
 }
