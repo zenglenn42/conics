@@ -20,6 +20,7 @@
 PROGRAMS  = hello-cube
 PROGRAMS += hello-cone
 PROGRAMS += hello-split
+PROGRAMS += hello-text
 INCDIR    = ..
 SHARED    = $(INCDIR)/shared
 
