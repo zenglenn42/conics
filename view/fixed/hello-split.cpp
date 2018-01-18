@@ -11,16 +11,18 @@
 //    Add some nice sub-window callback fu outlined in:
 //    http://www.lighthouse3d.com/tutorials/glut-tutorial/subwindows/
 //-----------------------------------------------------------------------------
+#include <iostream>
 #include <string>
 #include "shared/gltools.h"
 #include "shared/glframe.h"
 #include <math.h>
 
 GLuint mainWin, sub1Win, sub2Win;
-GLuint subGap = 30;
+GLfloat subGapPercent = 0.05;
 const GLuint msecDelay = 10;    // Delay for timer-based animation.
 GLFrame frameCamera;
 GLuint subWidth = 300;
+GLfloat subGap = subWidth * subGapPercent; // TODO: Add aspect ratio factor.
 GLuint width = subWidth * 2.0 + subGap * 3.0;
 GLuint height = width / 2.0;
 GLuint subHeight = height - 2 * subGap;
@@ -128,13 +130,17 @@ void RenderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
+#if 0
     GLfloat strPixelHeight = glutBitmapWidth(fontStyle, 'X');
-    GLfloat vNudge = 2.75 * strPixelHeight / height;
-
+    GLfloat vNudge = 1.5 * (subGap - strPixelHeight) / height;
+    std::cout << "subGap = " << subGap << std::endl;
+    std::cout << "vNudge = " << vNudge << std::endl;
+#endif
     GLfloat lNudge = (subGap * 3.0 / width) * .7 ;
     GLfloat rNudge = lNudge * .7;
-    DrawStr(-1.0 + lNudge, 1.0 - vNudge, "Side");
-    DrawStr( 0.0 + rNudge, 1.0 - vNudge, "Perspective");
+
+    DrawStr(-1.0 + lNudge, 0.9, "Side");
+    DrawStr( 0.0 + rNudge, 0.9, "Perspective");
     glutSwapBuffers();
 } // RenderScene
 
@@ -231,8 +237,9 @@ void ChangeSize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    GLfloat subWidth  = (w - subGap * 3) / 2.0;
-    GLfloat subHeight = h - subGap * 2;
+    subGap = w * subGapPercent; // TODO: Add aspect ratio factor.
+    subWidth  = (w - subGap * 3) / 2.0;
+    subHeight = h - subGap * 2;
 
     glutSetWindow(sub1Win);
     glutPositionWindow(subGap, subGap);
