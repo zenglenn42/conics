@@ -1,9 +1,8 @@
 //-----------------------------------------------------------------------------
 // Maintain the overall aspect ratio of a GLUT window.
 // Cycle through various well-known aspect ratios by pressing an arrow key.
-//
-// TODO: Fix y-centering of text after resize.
 //-----------------------------------------------------------------------------
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <math.h>
@@ -16,12 +15,14 @@ const GLfloat GOLDEN_RATIO = 1.618;
 const GLfloat HDTV_RATIO = 16.0 / 9.0;
 const GLfloat TV_RATIO = 4.0 / 3.0;
 GLfloat gAspectRatio = GOLDEN_RATIO;
-const std::string gWinTitle = "hello, aspect ratio";
+
 std::string gWinText;
+const std::string gWinTitle = "hello, aspect ratio";
 
 GLuint gWinPixelWidth  = 400;
 GLuint gWinPixelHeight = (GLfloat) gWinPixelWidth / gAspectRatio;
 
+void DrawModel();
 void DrawStr(GLuint x, GLuint y, std::string str, bool center);
 
 //-----------------------------------------------------------------------------
@@ -47,22 +48,23 @@ void SetupRC() {
 //-----------------------------------------------------------------------------
 void DrawStr(GLuint x, GLuint y, std::string str, bool center = true) {
 
-    glMatrixMode( GL_PROJECTION ) ;
+    glMatrixMode(GL_PROJECTION) ;
     glPushMatrix() ; // save
     glLoadIdentity();// and clear
-    glMatrixMode( GL_MODELVIEW ) ;
+    glMatrixMode(GL_MODELVIEW) ;
     glPushMatrix() ;
     glLoadIdentity() ;
     glDisable(GL_LIGHTING | GL_DEPTH_TEST);
 
-    GLfloat strPixelWidth = 0.0;
-
     if (center) {
+        GLfloat strPixelWidth = 0.0;
         for (int i = 0; i < str.length(); i++) {
             strPixelWidth += glutBitmapWidth(fontStyle, str[i]);
         }
-        GLfloat offset = (strPixelWidth / (1.0 * gWinPixelWidth)) / 2.0;
-        glRasterPos2f(x - offset, y);
+        GLfloat leftPixelMargin = (gWinPixelWidth - strPixelWidth) / 2.0;
+        GLfloat ndcLPM = leftPixelMargin / gWinPixelWidth;
+        GLfloat ndcOffset = 2.0 * ndcLPM; // Multiple by 2.0 b/c we range from -1.0 to 1.0.
+        glRasterPos2f(-1.0 + ndcOffset, y);
     } else {
         // Center at (x, y) = (0, 0).
         glRasterPos2f(x, y);
@@ -79,6 +81,17 @@ void DrawStr(GLuint x, GLuint y, std::string str, bool center = true) {
     glPopMatrix();
 }
 
+void DrawModel() {
+    // Coordinate axes.
+    glBegin(GL_LINES);
+        glVertex2f(0.0,  1.0);
+        glVertex2f(0.0, -1.0);
+
+        glVertex2f(-1.0,  0.0);
+        glVertex2f( 1.0,  0.0);
+    glEnd();
+}
+
 //-----------------------------------------------------------------------------
 // Called to draw scene.
 //-----------------------------------------------------------------------------
@@ -89,7 +102,10 @@ void RenderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    DrawStr(0, 0, gWinText, true);
+    glPushMatrix();
+        DrawStr(0, 0, gWinText);
+        DrawModel();
+    glPopMatrix();
 
     glutSwapBuffers();
 } // RenderScene
@@ -130,16 +146,22 @@ void ChangeSize(int w, int h) {
     gWinPixelWidth  = w;
     gWinPixelHeight = w / gAspectRatio;
     
-    // Reset the coordinate system before modifying.
+    // Set viewport to window dimensions
+    glViewport(0, 0, gWinPixelWidth, gWinPixelHeight);
 
+    // Reset the coordinate system before modifying.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    DrawStr(0, 0, gWinText, true);
+    // Enforce final window dimensions to maintain desired aspect ratio
+    // despite resize.
     glutReshapeWindow(gWinPixelWidth, gWinPixelHeight);
+
+    DrawStr(0, 0, gWinText);
+    DrawModel();
 }
 
 //-----------------------------------------------------------------------------
