@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Render stuff in two adjacent sub-windows.
+// Render stuff in two adjacent sub-windows with some lable text.
 //
 // Original code courtesy JH Kim:
 // http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html
@@ -10,21 +10,67 @@
 //
 //    Add some nice sub-window callback fu outlined in:
 //    http://www.lighthouse3d.com/tutorials/glut-tutorial/subwindows/
-//
-//    Fix ChangeSize
 //-----------------------------------------------------------------------------
+#include <string>
 #include "shared/gltools.h"
 #include "shared/glframe.h"
 #include <math.h>
 
 GLuint mainWin, sub1Win, sub2Win;
-GLuint subWidth = 300;
-GLuint subHeight = 300;
-GLuint subGap = 20;
+GLuint subGap = 30;
 const GLuint msecDelay = 10;    // Delay for timer-based animation.
 GLFrame frameCamera;
+GLuint subWidth = 300;
+GLuint width = subWidth * 2.0 + subGap * 3.0;
+GLuint height = width / 2.0;
+GLuint subHeight = height - 2 * subGap;
+GLvoid *fontStyle = GLUT_BITMAP_HELVETICA_18;
 
+void DrawStr(GLfloat x, GLfloat y, std::string str, bool center);
 void ResetViewport();
+
+//-----------------------------------------------------------------------------
+// Draw bitmap font string
+//
+// Most of the configuration fu for rendering simple 2D text comes from
+// in a graphics context comes from:
+//
+// https://stackoverflow.com/questions/9430852/glutbitmapcharacter-positions-text-wrong
+//-----------------------------------------------------------------------------
+void DrawStr(GLfloat x, GLfloat y, std::string str, bool center = false) {
+
+    glMatrixMode( GL_PROJECTION ) ;
+    glPushMatrix() ; // save
+    glLoadIdentity();// and clear
+    glMatrixMode( GL_MODELVIEW ) ;
+    glPushMatrix() ;
+    glLoadIdentity() ;
+    glDisable(GL_LIGHTING | GL_DEPTH_TEST);
+
+    GLfloat strPixelWidth = 0.0;
+
+    if (center) {
+        for (int i = 0; i < str.length(); i++) {
+            strPixelWidth += glutBitmapWidth(fontStyle, str[i]);
+        }
+        GLfloat offset = (strPixelWidth / (1.0 * width)) / 2.0;
+        glRasterPos2f(x - offset, y);
+    } else {
+        glRasterPos2f(x, y);	// NB: center is at (0.0, 0.0)
+    }
+
+    // Set text color.
+    glColor4f(1.0f, 1.0, 1.0f, 1.0f);
+
+    for(int i = 0; i < str.length(); i++) {
+        glutBitmapCharacter(fontStyle, str[i]);
+    }
+    glEnable(GL_LIGHTING | GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
 
 //-----------------------------------------------------------------------------
 // This function resets the viewport.
@@ -82,16 +128,14 @@ void RenderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    // frameCamera.ApplyCameraTransform();
+    GLfloat strPixelHeight = glutBitmapWidth(fontStyle, 'X');
+    GLfloat vNudge = 2.75 * strPixelHeight / height;
 
-    glutSetWindow(sub1Win);
-    glutPositionWindow(subGap, subGap);
-
-    glutSetWindow(sub2Win);
-    glutPositionWindow(subGap + subWidth + subGap, subGap);
-
+    GLfloat lNudge = (subGap * 3.0 / width) * .7 ;
+    GLfloat rNudge = lNudge * .7;
+    DrawStr(-1.0 + lNudge, 1.0 - vNudge, "Side");
+    DrawStr( 0.0 + rNudge, 1.0 - vNudge, "Perspective");
     glutSwapBuffers();
-
 } // RenderScene
 
 //-----------------------------------------------------------------------------
@@ -166,11 +210,10 @@ void TimerFunction(int timerParam) {
 
 //-----------------------------------------------------------------------------
 // Called by GLUT library when user changes windows size.
-//
-// TODO: Fix me :-)
 //-----------------------------------------------------------------------------
 void ChangeSize(int w, int h) {   
     GLfloat fAspect;
+    width = w;
     
     // Prevent a divide by zero, when window is too short
     // (you cant make a window of zero width).
@@ -184,11 +227,22 @@ void ChangeSize(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
-    // Set the clipping volume
-    gluPerspective(35.0f, fAspect, 1.0f, 50.0f);
-    
+    gluOrtho2D(0, w, h, 0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    
+    GLfloat subWidth  = (w - subGap * 3) / 2.0;
+    GLfloat subHeight = h - subGap * 2;
+
+    glutSetWindow(sub1Win);
+    glutPositionWindow(subGap, subGap);
+    glutReshapeWindow(subWidth, subHeight);
+
+    glutSetWindow(sub2Win);
+    glutPositionWindow(subGap + subWidth + subGap, subGap);
+    glutReshapeWindow(subWidth, subHeight);
+
+    glutSetWindow(mainWin);
 }
 
 //-----------------------------------------------------------------------------
