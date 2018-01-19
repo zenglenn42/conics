@@ -14,6 +14,7 @@ GLvoid *fontStyle = GLUT_BITMAP_HELVETICA_18;
 const GLfloat GOLDEN_RATIO = 1.618;
 const GLfloat HDTV_RATIO = 16.0 / 9.0;
 const GLfloat TV_RATIO = 4.0 / 3.0;
+const GLfloat ONE_2_ONE_RATIO = 1.0;
 GLfloat gAspectRatio = GOLDEN_RATIO;
 
 std::string gWinText;
@@ -23,7 +24,7 @@ GLuint gWinPixelWidth  = 400;
 GLuint gWinPixelHeight = (GLfloat) gWinPixelWidth / gAspectRatio;
 
 void DrawModel();
-void DrawStr(GLuint x, GLuint y, std::string str, bool center);
+void DrawBitmapStr(GLuint x, GLuint y, std::string str, bool center);
 
 //-----------------------------------------------------------------------------
 // This function initializes the rendering context.
@@ -46,7 +47,7 @@ void SetupRC() {
 //
 // https://stackoverflow.com/questions/9430852/glutbitmapcharacter-positions-text-wrong
 //-----------------------------------------------------------------------------
-void DrawStr(GLuint x, GLuint y, std::string str, bool center = true) {
+void DrawBitmapStr(GLuint x, GLuint y, std::string str, bool center = true) {
 
     glMatrixMode(GL_PROJECTION) ;
     glPushMatrix() ; // save
@@ -82,11 +83,15 @@ void DrawStr(GLuint x, GLuint y, std::string str, bool center = true) {
 }
 
 void DrawModel() {
+    DrawBitmapStr(0, 0, gWinText);
+
     // Coordinate axes.
     glBegin(GL_LINES);
+	// vertical axis
         glVertex2f(0.0,  1.0);
         glVertex2f(0.0, -1.0);
 
+	// horizontal axis
         glVertex2f(-1.0,  0.0);
         glVertex2f( 1.0,  0.0);
     glEnd();
@@ -103,7 +108,6 @@ void RenderScene(void) {
     glEnable(GL_DEPTH_TEST);
 
     glPushMatrix();
-        DrawStr(0, 0, gWinText);
         DrawModel();
     glPopMatrix();
 
@@ -124,6 +128,8 @@ void SpecialKeys(int key, int x, int y) {
             } else if (gAspectRatio == HDTV_RATIO) {
                gAspectRatio = TV_RATIO;
             } else if (gAspectRatio == TV_RATIO) {
+               gAspectRatio = ONE_2_ONE_RATIO;
+            } else if (gAspectRatio == ONE_2_ONE_RATIO) {
                gAspectRatio = GOLDEN_RATIO;
             }
             std::stringstream ss;
@@ -140,13 +146,24 @@ void SpecialKeys(int key, int x, int y) {
 }
 
 //-----------------------------------------------------------------------------
-// Called by GLUT library when user changes windows size.
+// Called by GLUT library when user changes window size.
 //-----------------------------------------------------------------------------
 void ChangeSize(int w, int h) {   
+    GLint screenPixelHeight = glutGet(GLUT_SCREEN_HEIGHT);
+
     gWinPixelWidth  = w;
     gWinPixelHeight = w / gAspectRatio;
-    
-    // Set viewport to window dimensions
+
+    if (gWinPixelHeight > screenPixelHeight) {
+        // Clamp the window height to something viewable on this display.
+        gWinPixelHeight = h;
+        gWinPixelWidth  = h * gAspectRatio;
+    }
+
+    // Set (external) window dimensions to maintain desired aspect ratio.
+    glutReshapeWindow(gWinPixelWidth, gWinPixelHeight);
+
+    // Set (internal) viewport to window dimensions.
     glViewport(0, 0, gWinPixelWidth, gWinPixelHeight);
 
     // Reset the coordinate system before modifying.
@@ -156,11 +173,6 @@ void ChangeSize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // Enforce final window dimensions to maintain desired aspect ratio
-    // despite resize.
-    glutReshapeWindow(gWinPixelWidth, gWinPixelHeight);
-
-    DrawStr(0, 0, gWinText);
     DrawModel();
 }
 
