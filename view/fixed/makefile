@@ -26,6 +26,7 @@ PROGRAMS += hello-split-ar
 PROGRAMS += hello-bezier
 PROGRAMS += hello-gpubez
 PROGRAMS += hello-gpubez-1
+PROGRAMS += hello-parabola
 INCDIR    = ..
 SHARED    = $(INCDIR)/shared
 
