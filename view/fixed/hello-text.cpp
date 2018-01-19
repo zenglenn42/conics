@@ -14,8 +14,8 @@
 #include <math.h>
 
 GLvoid *fontStyle = GLUT_BITMAP_HELVETICA_18;
-GLuint width  = 200;
-GLuint height = width * 0.681;
+GLuint gWinPixelWidth  = 200;
+GLuint gWinPixelHeight = gWinPixelWidth * 0.681;
 
 void DrawStr(GLuint x, GLuint y, std::string str, bool center);
 
@@ -57,8 +57,13 @@ void DrawStr(GLuint x, GLuint y, std::string str, bool center = true) {
         for (int i = 0; i < str.length(); i++) {
             strPixelWidth += glutBitmapWidth(fontStyle, str[i]);
         }
-        GLfloat offset = (strPixelWidth / (1.0 * width)) / 2.0;
-        glRasterPos2f(x - offset, y);
+        //GLfloat offset = (strPixelWidth / (1.0 * gWinPixelWidth)) / 2.0;
+        //glRasterPos2f(x - offset, y);
+
+	GLfloat leftPixelMargin = (gWinPixelWidth - strPixelWidth) / 2.0;
+        GLfloat ndcLPM = leftPixelMargin / gWinPixelWidth;
+        GLfloat ndcOffset = 2.0 * ndcLPM; // Multiple by 2.0 b/c we range from -1.0 to 1.0.
+        glRasterPos2f(-1.0 + ndcOffset, y);
     } else {
 	// Center at (x, y) = (0, 0).
         glRasterPos2f(x, y);
@@ -112,7 +117,7 @@ void SpecialKeys(int key, int x, int y) {
 //-----------------------------------------------------------------------------
 void ChangeSize(int w, int h) {   
     GLfloat fAspect;
-    width = w;
+    gWinPixelWidth = w;
     
     // Prevent a divide by zero, when window is too short
     // (you cant make a window of zero width).
@@ -140,7 +145,7 @@ void ChangeSize(int w, int h) {
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(width, height);
+    glutInitWindowSize(gWinPixelWidth, gWinPixelHeight);
 
     glutCreateWindow("hello, text");
     glutReshapeFunc(ChangeSize);
