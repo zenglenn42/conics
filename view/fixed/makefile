@@ -25,6 +25,7 @@ PROGRAMS += hello-reshape
 PROGRAMS += hello-split-ar
 PROGRAMS += hello-bezier
 PROGRAMS += hello-gpubez
+PROGRAMS += hello-gpubez-1
 INCDIR    = ..
 SHARED    = $(INCDIR)/shared
 
