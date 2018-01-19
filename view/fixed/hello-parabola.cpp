@@ -21,7 +21,7 @@ const GLfloat TWO_2_ONE_RATIO = 2.0;
 const GLfloat ONE_2_ONE_RATIO = 1.0;
 GLfloat gAspectRatio = ONE_2_ONE_RATIO;
 
-std::string gWinText = "parabola(t) = (1/sqrt(2)) * (t^2 - 1)";
+std::string gWinText = "f(t) = (1/sqrt(2)) * (t^2 - 1)";
 const std::string gWinTitle = "hello, parabola";
 
 GLuint gWinPixelWidth  = 400;
@@ -67,6 +67,11 @@ void SetupRC() {
 
     glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &gBezierControlPoints[0][0]);
     glEnable(GL_MAP1_VERTEX_3);
+
+    // Less jaggy lines means less jaggy parabola.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
 }
 
 //-----------------------------------------------------------------------------
