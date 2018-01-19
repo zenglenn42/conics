@@ -116,10 +116,17 @@ struct ConicParabola {
 	Line2D directrix{0.0, 0.0};
 };
 
-struct BezierControlPoints2D {
+struct BezierControlPoints2ndOrder {
 	Point2D B0;
 	Point2D B1;
 	Point2D B2;
+};
+
+struct BezierControlPoints3rdOrder {
+	Point2D B0;
+	Point2D B1;
+	Point2D B2;
+	Point2D B3;
 };
 
 struct Axis2D {
@@ -138,31 +145,31 @@ struct Axes2D {
 struct BezierParabola2D {
 	BezierParabola2D(ConicParabola parabola) : parabola(parabola) {}
 
-	BezierControlPoints2D operator()(double minX, double maxX) {
+	BezierControlPoints2ndOrder operator()(double minX, double maxX) {
 		// test minX < maxX
 
 		// left control point is just parabola endpoint on left
-		bcp.B0.x = minX;
-		bcp.B0.y = parabola(minX);
+		bcp2.B0.x = minX;
+		bcp2.B0.y = parabola(minX);
 
 		// center point midway between endpoints B0 and B2
-		double cx = bcp.B0.x + std::abs(maxX - minX)/2.0;
-		double cy = bcp.B0.y;
+		double cx = bcp2.B0.x + std::abs(maxX - minX)/2.0;
+		double cy = bcp2.B0.y;
 
 		// midpoint between B0.x and cx
-		double mx = bcp.B0.x + abs(bcp.B0.x - cx)/2.0;
+		double mx = bcp2.B0.x + abs(bcp2.B0.x - cx)/2.0;
 
 		// parabola vertex
 		double vx = cx;
 		double vy = parabola(vx);
 
 		// middle control point
-		bcp.B1.x = vx;
+		bcp2.B1.x = vx;
 
 		// std::cout << "abs(vy - cy) = " << abs(vy - cy) << std::endl;
-		// std::cout << "abs(bcp.B0.x - cx) = " << abs(bcp.B0.x - cx) << std::endl;
+		// std::cout << "abs(bcp2.B0.x - cx) = " << abs(bcp2.B0.x - cx) << std::endl;
 
-		double deltaY = abs(vy - cy) * abs(bcp.B0.x - cx) / abs(mx - cx);
+		double deltaY = abs(vy - cy) * abs(bcp2.B0.x - cx) / abs(mx - cx);
 
 		// std::cout << "cy = "     << cy     << std::endl;
 		// std::cout << "deltaY = " << deltaY << std::endl;
@@ -170,17 +177,34 @@ struct BezierParabola2D {
 		// std::cout << "vy = " << vy << std::endl;
 		// std::cout << "cy = " << cy << std::endl;
 
-		bcp.B1.y = vy < cy ? cy - deltaY : cy + deltaY;
+		bcp2.B1.y = vy < cy ? cy - deltaY : cy + deltaY;
 
 		// right control point is just parabola endpoint on right
-		bcp.B2.x = maxX;
-		bcp.B2.y = parabola(bcp.B2.x);
+		bcp2.B2.x = maxX;
+		bcp2.B2.y = parabola(bcp2.B2.x);
 
-		return bcp;
+		return bcp2;
+	}
+
+
+	BezierControlPoints3rdOrder get3rdOrderControlPoints() {
+		// Convert 2nd order Bezier control points to equivalent 3rd order Bezier.
+		bcp3.B0 = bcp2.B0;
+
+		bcp3.B1.x = bcp2.B0.x + (2.0/3.0) * (bcp2.B1.x - bcp2.B0.x);
+		bcp3.B1.y = bcp2.B0.y + (2.0/3.0) * (bcp2.B1.y - bcp2.B0.y);
+
+		bcp3.B2.x = bcp2.B2.x + (2.0/3.0) * (bcp2.B1.x - bcp2.B2.x);
+		bcp3.B2.y = bcp2.B2.y + (2.0/3.0) * (bcp2.B1.y - bcp2.B2.y);
+
+		bcp3.B3 = bcp2.B2;
+
+		return bcp3;		
 	}
 
 	ConicParabola parabola;
-	BezierControlPoints2D bcp;
+	BezierControlPoints2ndOrder bcp2;
+	BezierControlPoints3rdOrder bcp3;
 };
 
 struct GpuParabola2D {
@@ -190,10 +214,18 @@ struct GpuParabola2D {
 	Axes2D axes;
 };
 
-std::ostream& operator<<(std::ostream& os, const BezierControlPoints2D& bcp) {
+std::ostream& operator<<(std::ostream& os, const BezierControlPoints2ndOrder& bcp) {
 	os << "B0(" << bcp.B0.x << ", " << bcp.B0.y << ") ";
 	os << "B1(" << bcp.B1.x << ", " << bcp.B1.y << ") ";
 	os << "B2(" << bcp.B2.x << ", " << bcp.B2.y << ")";
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const BezierControlPoints3rdOrder& bcp) {
+	os << "B0(" << bcp.B0.x << ", " << bcp.B0.y << ") ";
+	os << "B1(" << bcp.B1.x << ", " << bcp.B1.y << ") ";
+	os << "B2(" << bcp.B2.x << ", " << bcp.B2.y << ") ";
+	os << "B3(" << bcp.B3.x << ", " << bcp.B3.y << ")";
 	return os;
 }
 
@@ -230,9 +262,13 @@ int main() {
 	std::cout << "directrix @ vertex = " << parabola.directrix(parabola.vertex.x) << std::endl;
 	std::cout << std::endl;
 
-	BezierControlPoints2D parabolaCP = bezierParabola(minX, maxX);
+	BezierControlPoints2ndOrder parabolaCP2 = bezierParabola(minX, maxX);
 	std::cout << "2nd Order Bezier Control Points" << std::endl;
-	std::cout << parabolaCP << std::endl << std::endl;
+	std::cout << parabolaCP2 << std::endl << std::endl;
+
+	BezierControlPoints3rdOrder parabolaCP3 = bezierParabola.get3rdOrderControlPoints();
+	std::cout << "3rd Order Bezier Control Points" << std::endl;
+	std::cout << parabolaCP3 << std::endl << std::endl;
 
 	Point2D pMinX;
 	pMinX.x = minX;
