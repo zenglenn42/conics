@@ -22,6 +22,7 @@ PROGRAMS += hello-cone
 PROGRAMS += hello-split
 PROGRAMS += hello-text
 PROGRAMS += hello-reshape
+PROGRAMS += hello-split-ar
 INCDIR    = ..
 SHARED    = $(INCDIR)/shared
 

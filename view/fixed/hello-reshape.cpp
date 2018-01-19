@@ -14,6 +14,7 @@ GLvoid *fontStyle = GLUT_BITMAP_HELVETICA_18;
 const GLfloat GOLDEN_RATIO = 1.618;
 const GLfloat HDTV_RATIO = 16.0 / 9.0;
 const GLfloat TV_RATIO = 4.0 / 3.0;
+const GLfloat TWO_2_ONE_RATIO = 2.0;
 const GLfloat ONE_2_ONE_RATIO = 1.0;
 GLfloat gAspectRatio = GOLDEN_RATIO;
 
@@ -128,6 +129,8 @@ void SpecialKeys(int key, int x, int y) {
             } else if (gAspectRatio == HDTV_RATIO) {
                gAspectRatio = TV_RATIO;
             } else if (gAspectRatio == TV_RATIO) {
+               gAspectRatio = TWO_2_ONE_RATIO;
+            } else if (gAspectRatio == TWO_2_ONE_RATIO) {
                gAspectRatio = ONE_2_ONE_RATIO;
             } else if (gAspectRatio == ONE_2_ONE_RATIO) {
                gAspectRatio = GOLDEN_RATIO;
