@@ -24,3 +24,7 @@ Make it easy to change the aspect ratio, too.
 And it would be nice to leverage some OpenGL primitives (like glMap1f() and glEvalCoord1f()) to render an actual conic:
 
 ![alt tag](view/img/hello-parabola.png)
+
+Render a 2D and 3D parabola.  Illumination obviously needs some work, but incrementally interesting.
+
+![alt tag](view/img/hello-split-parabolas.png)
