@@ -1,34 +1,33 @@
 //-----------------------------------------------------------------------------
-// Render stuff in two adjacent sub-windows with some lable text, maintaining
-// a desired overall aspect ratio in the parent window.
+// Render a 2D and 3D parabola in adjacent sub-windows with some lable text, 
+// maintaining a desired overall aspect ratio in the parent window.
 //
-// Original code courtesy JH Kim:
-// http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html
+// TODO: Get top cone to illuminate.
+//       Get transparency working for intersection.
 //
-// Copyright © Glenn Streiff 2017 (derivative work)
-//
-// TODO:
-//    Get rid of all these dang globals. :-/
-//    Add some nice sub-window callback fu outlined in:
-//    http://www.lighthouse3d.com/tutorials/glut-tutorial/subwindows/
+// Copyright © Glenn Streiff 2017
 //-----------------------------------------------------------------------------
 #include <iostream>
 #include <string>
+#include <math.h>
 #include "shared/gltools.h"
 #include "shared/glframe.h"
-#include <math.h>
 
 GLvoid *fontStyle = GLUT_BITMAP_HELVETICA_18;
 
-const GLfloat GOLDEN_RATIO = 1.618;
-const GLfloat HDTV_RATIO = 16.0 / 9.0;
-const GLfloat TV_RATIO = 4.0 / 3.0;
 const GLfloat TWO_2_ONE_RATIO = 2.0;
-const GLfloat ONE_2_ONE_RATIO = 1.0;
 GLfloat gAspectRatio = TWO_2_ONE_RATIO;
 
+GLfloat gBezierControlPoints[4][3] = {
+    {-2.0, 2.121, 0.0}, {-0.667, -1.650, 0.0}, {0.667, -1.650, 0.0}, {2.0, 2.121, 0.0}
+};
+
+GLfloat gFocus[1][3] = {
+    {0.0, -0.354, 0.0}
+};
+
 GLuint mainWin, sub1Win, sub2Win;
-GLfloat gSubGapPercent = 0.05;
+GLfloat gSubGapPercent = 0.04;
 const GLuint msecDelay = 10;    // Delay for timer-based animation.
 GLFrame frameCamera;
 GLuint gSubWidth = 300;
@@ -38,6 +37,8 @@ GLuint gWinPixelHeight = gSubWidth / gAspectRatio + gSubGap * 2.0;
 GLuint gSubHeight = gWinPixelHeight - 2 * gSubGap;
 
 void DrawStr(GLfloat x, GLfloat y, std::string str, bool center);
+void DrawParabola();
+void DrawCones(GLboolean drawBasePlane);
 void ResetViewport();
 
 //-----------------------------------------------------------------------------
@@ -77,6 +78,7 @@ void DrawStr(GLfloat x, GLfloat y, std::string str, bool center = false) {
         glutBitmapCharacter(fontStyle, str[i]);
     }
     glEnable(GL_LIGHTING | GL_DEPTH_TEST);
+    glEnable(GL_LIGHT0);
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
@@ -103,6 +105,28 @@ void SetupRC() {
     // Bluish background
     glClearColor(0.0f, 0.3f, 0.80f, 1.0f);
 
+    // Configure a map to support downstream evaluation of
+    // a 3rd order Bezier curve.
+
+    //          +-- Triggers generation of glVertex3 commands by evaluator.
+    //          |
+    //          |              +-- min parametric value, i think ;-)
+    //          |              |
+    //          |              |    +-- max parametric value
+    //          |              |    |
+    //          |              |    |   +-- stride, # of values between gBezierControlPoints.
+    //          |              |    |   |   So a 3d control point will have x, y, z
+    //          |              |    |   |   values between control point boundaries,
+    //          |              |    |   |   or a stried of 3
+    //          |              |    |   |
+    //          |              |    |   |  +-- number of control points
+    //          |              |    |   |  |
+    //          |              |    |   |  |   +-- ptr to array of control points
+    //          |              |    |   |  |   |
+
+    //glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &gBezierControlPoints[0][0]);
+    //glEnable(GL_MAP1_VERTEX_3);
+
     // Avoid jaggy lines
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -113,22 +137,54 @@ void SetupRC() {
 // Draw teapot
 //-----------------------------------------------------------------------------
 void DrawScene() {
-    glColor3f(0.7, 0.7, 0.7);
     glPushMatrix();
+        // Gray base-plane.
+        glBegin(GL_QUADS);
+            glColor3f(0.7, 0.7, 0.7);
+            glVertex3f(2.0, 0.0, 2.0);
+            glVertex3f(2.0, 0.0, -2.0);
+            glVertex3f(-2.0, 0.0, -2.0);
+            glVertex3f(-2.0, 0.0, 2.0);
+        glEnd();
 
-    glBegin(GL_QUADS);
-    glVertex3f(2.0, 0.0, 2.0);
-    glVertex3f(2.0, 0.0, -2.0);
-    glVertex3f(-2.0, 0.0, -2.0);
-    glVertex3f(-2.0, 0.0, 2.0);
-    glEnd();
-
+        // White base-plane axes.
+        glBegin(GL_LINES);
+            glColor3f(1.0, 1.0, 1.0);
+            glVertex3f(0.0, 0.0, 2.0);
+            glVertex3f(0.0, 0.0, -2.0);
+            glVertex3f(-2.0, 0.0, 0.0);
+            glVertex3f(2.0, 0.0, 0.0);
+        glEnd();
     glPopMatrix();
-    glColor3f(1.0, 1.0, 1.0);
+
+    // Intersecting plane.
     glPushMatrix();
-    glTranslatef(0.0, 0.0, -0.5);
-    glutWireTeapot(1.0);
+        glColor3f(1.0, 0.0, 0.0);
+        glTranslatef(0.0, 1.5, 0.0);
+        glRotatef(45.0, 0.0, 0.0, 1.0);
+        glBegin(GL_QUADS);
+            glColor3f(1.0, 0.0, 0.0);
+            glVertex3f(1.5, 0.0, 1.5);
+            glVertex3f(1.5, 0.0, -1.5);
+            glVertex3f(-1.5, 0.0, -1.5);
+            glVertex3f(-1.5, 0.0, 1.5);
+        glEnd();
     glPopMatrix();
+
+    glPushMatrix();
+        // Bottom cone.
+        glColor3f(1.0, 0.0, 1.0);
+        glRotatef(-90.0, 1.0, 0.0, 0.0);
+        glutSolidCone(1.0, 1.0, 20, 20);
+    glPopMatrix();
+    glPushMatrix();
+        // Top cone.
+        glTranslatef(0.0, 2.0, 0.0);
+        glColor3f(0.0, 1.0, 1.0);
+        glRotatef(90.0, 1.0, 0.0, 0.0);
+        glutSolidCone(1.0, 1.0, 20, 20);
+    glPopMatrix();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -148,8 +204,8 @@ void RenderScene(void) {
     GLfloat lNudge = (gSubGap * 3.0 / gWinPixelWidth) * .7 ;
     GLfloat rNudge = lNudge * .7;
 
-    DrawStr(-1.0 + lNudge, 0.9, "Side");
-    DrawStr( 0.0 + rNudge, 0.9, "Perspective");
+    DrawStr(-1.0 + lNudge, 0.9, "2D Projection");
+    DrawStr( 0.0 + rNudge, 0.9, "3D Perspective");
     glutSwapBuffers();
 } // RenderScene
 
@@ -157,33 +213,134 @@ void RenderScene(void) {
 // Called to draw sub-scene.
 //-----------------------------------------------------------------------------
 void RenderSubScene1(void) {
-    ResetViewport();
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-    glPushMatrix();
-    gluLookAt(0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    DrawScene();
-    glPopMatrix();
+    DrawParabola();
     glutSwapBuffers();
+}
+
+//-----------------------------------------------------------------------------
+void DrawParabola() {
+   int i;
+
+    glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &gBezierControlPoints[0][0]);
+    glEnable(GL_MAP1_VERTEX_3);
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 1.0, 1.0);
+
+    // Coordinate axes.
+
+    glColor4f(0.3, 0.3, 0.3, 1.0f);       // gray text
+    glBegin(GL_LINES);
+        // vertical axis
+        glVertex2f(0.0,  1.0);
+        glVertex2f(0.0, -1.0);
+
+        // horizontal axis
+        glVertex2f(-1.0,  0.0);
+        glVertex2f( 1.0,  0.0);
+    glEnd();
+
+   // Render Bezier curve.
+
+   glColor4f(1.0, 1.0, 1.0, 1.0f);       // white text
+   glBegin(GL_LINE_STRIP);
+      //
+      // Subdivide the curve into steps between the min and max
+      // parametric values, evaluating the curve as we go and
+      // issuing corresponding glVertex3 calls.
+      //
+      // Within a GL_LINE_STRIP context, effect is to join points
+      // along the curve by straight lines, approximating the
+      // overall curve.
+      //
+      for (i = 0; i <= 30; i++)
+         glEvalCoord1f((GLfloat) i/30.0);
+   glEnd();
+
+   // Render parabola focus.
+
+   glPointSize(7.0);
+   glEnable(GL_POINT_SMOOTH);	// round points
+   glBegin(GL_POINTS);
+         glVertex3fv(&gFocus[0][0]);
+   glEnd();
+}
+
+void DrawCones(GLboolean drawBasePlane)
+{
+    GLfloat refSize = 200.0f; // Dimension of visible universe.
+    GLfloat maxCoord = refSize / 2.0;
+    GLfloat minCoord = -maxCoord;
+
+    GLfloat yOffset = 0.0f;
+    if (drawBasePlane)
+    {
+        // Draw plane that the objects rest on
+        glColor3f(0.0f, 0.0f, 0.90f); // Blue
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glBegin(GL_QUADS);
+            glVertex3f(minCoord, yOffset, minCoord);
+            glVertex3f(minCoord, yOffset, maxCoord);
+            glVertex3f(maxCoord, yOffset, maxCoord);
+            glVertex3f(maxCoord, yOffset, minCoord);
+        glEnd();
+    }
+
+    // Draw double cone
+
+    GLfloat coneRefSize = refSize / 4.0f;
+
+    GLfloat coneRadius = coneRefSize;
+    GLfloat coneHeight = coneRefSize;
+    GLint   coneSlices = coneRefSize;
+    GLint   coneStacks = coneRefSize;
+
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glPushMatrix();
+        // bottom cone
+        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+        glTranslatef(0.0f, 0.0f, 0.0f);
+        glutSolidCone(coneRadius, coneHeight, coneSlices, coneStacks);
+    glPopMatrix();
+
+    glPushMatrix();
+        // top cone
+        glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        glTranslatef(0.0f, 0.0f, -100.0f);
+        glutSolidCone(coneRadius, coneHeight, coneSlices, coneStacks);
+    glPopMatrix();
 }
 
 //-----------------------------------------------------------------------------
 // Called to draw sub-scene.
 //-----------------------------------------------------------------------------
 void RenderSubScene2(void) {
-    ResetViewport();
+    //ResetViewport();
 
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
+
+    glEnable(GL_LIGHTING);
+    GLfloat lightPos[] = {5.0f,5.0f, 5.0f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    glEnable(GL_LIGHT0);
+
+    // Allow surfaces to reflect color gradations
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
         glLoadIdentity();
+        //DrawCones(GL_FALSE);
         gluPerspective(30, 1.0, 3.0, 50.0);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
-            gluLookAt(5.0, 5.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+            //gluLookAt(3.0, 3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+            gluLookAt(0.0, 3.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
             DrawScene();
         glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -200,24 +357,7 @@ void SpecialKeys(int key, int x, int y) {
         case GLUT_KEY_UP:
         case GLUT_KEY_DOWN:
         case GLUT_KEY_LEFT:
-        case GLUT_KEY_RIGHT: {
-            if (gAspectRatio == GOLDEN_RATIO) {
-               gAspectRatio = HDTV_RATIO;
-            } else if (gAspectRatio == HDTV_RATIO) {
-               gAspectRatio = TV_RATIO;
-            } else if (gAspectRatio == TV_RATIO) {
-               gAspectRatio = TWO_2_ONE_RATIO;
-            } else if (gAspectRatio == TWO_2_ONE_RATIO) {
-               gAspectRatio = ONE_2_ONE_RATIO;
-            } else if (gAspectRatio == ONE_2_ONE_RATIO) {
-               gAspectRatio = GOLDEN_RATIO;
-            }
-            // std::stringstream ss;
-            // ss << "aspect ratio = " << gAspectRatio;
-            // gWinText = ss.str();
-            // gWinPixelHeight = gWinPixelWidth / gAspectRatio;
-            // glutReshapeWindow(gWinPixelWidth, gWinPixelHeight);
-            }
+        case GLUT_KEY_RIGHT:
             break;
         default:
             break;
@@ -294,7 +434,7 @@ int main(int argc, char* argv[]) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(gSubWidth * 2 + gSubGap * 3, gSubHeight * 1 + gSubGap * 2);
 
-    mainWin = glutCreateWindow("Hello, subWindows");
+    mainWin = glutCreateWindow("Hello, parabolas");
     glutReshapeFunc(ChangeSize);
     glutDisplayFunc(RenderScene);
 
