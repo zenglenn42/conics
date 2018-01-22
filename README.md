@@ -27,4 +27,4 @@ And it would be nice to leverage some OpenGL primitives (like glMap1f() and glEv
 
 Render a 2D and 3D parabola.  Illumination obviously needs some work, but incrementally interesting.
 
-![alt tag](view/img/hello-split-parabolas.png)
+![alt tag](view/img/hello-split-parabola.png)
