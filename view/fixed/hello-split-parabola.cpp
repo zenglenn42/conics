@@ -139,8 +139,8 @@ void SetupRC() {
 void DrawScene() {
     glPushMatrix();
         // Gray base-plane.
+        glColor3f(0.7, 0.7, 0.7);
         glBegin(GL_QUADS);
-            glColor3f(0.7, 0.7, 0.7);
             glVertex3f(2.0, 0.0, 2.0);
             glVertex3f(2.0, 0.0, -2.0);
             glVertex3f(-2.0, 0.0, -2.0);
@@ -148,8 +148,8 @@ void DrawScene() {
         glEnd();
 
         // White base-plane axes.
+        glColor3f(1.0, 1.0, 1.0);
         glBegin(GL_LINES);
-            glColor3f(1.0, 1.0, 1.0);
             glVertex3f(0.0, 0.0, 2.0);
             glVertex3f(0.0, 0.0, -2.0);
             glVertex3f(-2.0, 0.0, 0.0);
