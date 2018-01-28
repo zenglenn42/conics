@@ -7,9 +7,7 @@ It would be nice to have a couple different views on the same thing.  Maybe 2D i
 
 ![alt tag](view/img/hello-subWindows.png)
 
-The above is a stripped down version of some nice code from JH Kim:
-
-http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html
+The above is a stripped down version of some [nice code](http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html) from JH Kim:
 
 Oh, some text would be good too.  For now, I'm happy to get bitmapped text rendering.  When I'm ready to be fancy, I'll switch to strocked fonts.
 
