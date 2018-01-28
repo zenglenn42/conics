@@ -25,6 +25,46 @@ And it would be nice to leverage some OpenGL primitives (like glMap1f() and glEv
 
 ![alt tag](view/img/hello-parabola.png)
 
+```
+    // Configure a map to support downstream evaluation of
+    // a 3rd order Bezier curve.
+
+    //          +-- Triggers generation of glVertex3 commands by evaluator.
+    //          |
+    //          |              +-- min parametric value, i think ;-)
+    //          |              |
+    //          |              |    +-- max parametric value
+    //          |              |    |
+    //          |              |    |   +-- stride, # of values between gBezierControlPoints.
+    //          |              |    |   |   So a 3d control point will have x, y, z
+    //          |              |    |   |   values between control point boundaries,
+    //          |              |    |   |   or a stried of 3
+    //          |              |    |   |
+    //          |              |    |   |  +-- number of control points
+    //          |              |    |   |  |
+    //          |              |    |   |  |   +-- ptr to array of control points
+    //          |              |    |   |  |   |
+
+    glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &gBezierControlPoints[0][0]);
+    glEnable(GL_MAP1_VERTEX_3);
+
+    ...
+
+   glBegin(GL_LINE_STRIP);
+      //
+      // Subdivide the curve into steps between the min and max
+      // parametric values, evaluating the curve as we go and
+      // issuing corresponding glVertex3 calls.
+      //
+      // Within a GL_LINE_STRIP context, effect is to join points
+      // along the curve by straight lines, approximating the
+      // overall curve.
+      //
+      for (i = 0; i <= 30; i++)
+         glEvalCoord1f((GLfloat) i/30.0);
+   glEnd();
+```
+
 Render a 2D and 3D parabola.  Illumination obviously needs some work, but incrementally interesting.
 
 ![alt tag](view/img/hello-split-parabola.png)
