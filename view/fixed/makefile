@@ -29,6 +29,7 @@ PROGRAMS += hello-gpubez-1
 PROGRAMS += hello-parabola
 PROGRAMS += hello-parabolas
 PROGRAMS += hello-transparency
+PROGRAMS += hello-transparency-1
 INCDIR    = ..
 SHARED    = $(INCDIR)/shared
 
