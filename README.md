@@ -9,7 +9,7 @@ It would be nice to have a couple different views on the same thing.  Maybe 2D i
 
 The above is a stripped down version of some nice code from JH Kim:
 
-![alt tag](http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html)
+http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html
 
 Oh, some text would be good too.  For now, I'm happy to get bitmapped text rendering.  When I'm ready to be fancy, I'll switch to strocked fonts.
 
