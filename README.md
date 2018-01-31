@@ -79,7 +79,7 @@ Start exploring how to mix user-interface elements with OpenGL graphics, courtes
 
 ![alt tag](controller/img/hello-checkbox-solid.png)
 
-Getting libglui to build required digging into ![cmake](https://cmake.org).
+Getting libglui to build required digging into [cmake](https://cmake.org).
 ![alt tag](controller/img/cmake.png)
 
 And here are the rudiments of a nice little user interface, ready to modify ...
