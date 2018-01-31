@@ -17,3 +17,6 @@ target_link_libraries(hello-checkbox glui::glui_static ${GLUT_LIBRARIES} ${OPENG
 
 add_executable(hello-motion hello-motion.cpp)
 target_link_libraries(hello-motion glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+add_executable(hello-ui hello-ui.cpp)
+target_link_libraries(hello-ui glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
