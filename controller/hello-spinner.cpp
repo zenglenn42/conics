@@ -85,9 +85,9 @@ void myGlutDisplay()
     updated by GLUI ***/
   
   if ( wireframe )
-    glutWireTorus( .2,.5,16,segments );
+    glutWireCone( .2,.5,16,segments );
   else
-    glutSolidTorus( .2,.5,16,segments );
+    glutSolidCone( .2,.5,16,segments );
 
   glutSwapBuffers(); 
 }

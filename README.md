@@ -72,3 +72,9 @@ Render a 2D and 3D parabola.  Illumination obviously needs some work, but increm
 Better 3D parabola with transparency.
 
 ![alt tag](view/img/hello-transparency-1.png)
+
+Start exploring how to mix user-interface elements with OpenGL graphics, courtesy GLUI and Paul Rademacher, et al.
+
+![alt tag](controller/img/hello-checkbox-wire.png)
+
+![alt tag](controller/img/hello-checkbox-solid.png)
