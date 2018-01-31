@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
   glutInitWindowPosition( 50, 50 );
   glutInitWindowSize( 300, 300 );
  
-  main_window = glutCreateWindow( "GLUI Example 1" );
+  main_window = glutCreateWindow( "GLUI checkbox" );
   glutDisplayFunc( myGlutDisplay );
   glutReshapeFunc( myGlutReshape );  
 
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
   /*         Here's the GLUI code         */
   /****************************************/
   
-  GLUI *glui = GLUI_Master.create_glui( "GLUI" );
+  GLUI *glui = GLUI_Master.create_glui( "GLUI checkbox" );
   new GLUI_Checkbox( glui, "Wireframe", &wireframe );
 
   /* add more UI elements here ...        */
