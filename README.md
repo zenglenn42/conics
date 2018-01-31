@@ -78,3 +78,7 @@ Start exploring how to mix user-interface elements with OpenGL graphics, courtes
 ![alt tag](controller/img/hello-checkbox-wire.png)
 
 ![alt tag](controller/img/hello-checkbox-solid.png)
+
+And here are the rudiments of a nice little user interface, ready to modify ...
+
+![alt tag](controller/img/hello-ui.png)
