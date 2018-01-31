@@ -30,6 +30,7 @@ PROGRAMS += hello-parabola
 PROGRAMS += hello-parabolas
 PROGRAMS += hello-transparency
 PROGRAMS += hello-transparency-1
+PROGRAMS += hello-transparency-2
 INCDIR    = ..
 SHARED    = $(INCDIR)/shared
 
