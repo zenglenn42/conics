@@ -84,4 +84,4 @@ Getting libglui to build required digging into [cmake](https://cmake.org).
 
 And here are the rudiments of a nice little user interface, ready to modify ...
 
-![alt tag](controller/img/hello-ui.png)
+![alt tag](controller/img/hello-ui-1.png)
