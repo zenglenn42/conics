@@ -42,7 +42,7 @@ float scale = 1.0;
 int   show_cone = 1;
 int   show_torus=1;
 int   show_axes = 1;
-int   show_text = 1;
+int   show_text = 0;
 float cone_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float torus_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float view_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
@@ -82,29 +82,29 @@ GLfloat lights_rotation[16] = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 /**************************************** control_cb() *******************/
 /* GLUI control callback                                                 */
 
-void control_cb( int control )
+void control_cb(int control)
 {
-  if ( control == LIGHT0_ENABLED_ID ) {
-    if ( light0_enabled ) {
-      glEnable( GL_LIGHT0 );
+  if (control == LIGHT0_ENABLED_ID) {
+    if (light0_enabled) {
+      glEnable(GL_LIGHT0);
       light0_spinner->enable();
     }
     else {
-      glDisable( GL_LIGHT0 ); 
+      glDisable(GL_LIGHT0); 
       light0_spinner->disable();
     }
   }
-  else if ( control == LIGHT1_ENABLED_ID ) {
-    if ( light1_enabled ) {
-      glEnable( GL_LIGHT1 );
+  else if (control == LIGHT1_ENABLED_ID) {
+    if (light1_enabled) {
+      glEnable(GL_LIGHT1);
       light1_spinner->enable();
     }
     else {
-      glDisable( GL_LIGHT1 ); 
+      glDisable(GL_LIGHT1); 
       light1_spinner->disable();
     }
   }
-  else if ( control == LIGHT0_INTENSITY_ID ) {
+  else if (control == LIGHT0_INTENSITY_ID) {
     float v[] = { 
       light0_diffuse[0],  light0_diffuse[1],
       light0_diffuse[2],  light0_diffuse[3] };
@@ -113,9 +113,9 @@ void control_cb( int control )
     v[1] *= light0_intensity;
     v[2] *= light0_intensity;
 
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, v );
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, v);
   }
-  else if ( control == LIGHT1_INTENSITY_ID ) {
+  else if (control == LIGHT1_INTENSITY_ID) {
     float v[] = { 
       light1_diffuse[0],  light1_diffuse[1],
       light1_diffuse[2],  light1_diffuse[3] };
@@ -124,21 +124,21 @@ void control_cb( int control )
     v[1] *= light1_intensity;
     v[2] *= light1_intensity;
 
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, v );
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, v);
   }
-  else if ( control == ENABLE_ID )
+  else if (control == ENABLE_ID)
   {
     glui2->enable();
   }
-  else if ( control == DISABLE_ID )
+  else if (control == DISABLE_ID)
   {
     glui2->disable();
   }
-  else if ( control == SHOW_ID )
+  else if (control == SHOW_ID)
   {
     glui2->show();
   }
-  else if ( control == HIDE_ID )
+  else if (control == HIDE_ID)
   {
     glui2->hide();
   }
@@ -162,9 +162,9 @@ void myGlutKeyboard(unsigned char Key, int x, int y)
 
 /***************************************** myGlutMenu() ***********/
 
-void myGlutMenu( int value )
+void myGlutMenu(int value)
 {
-  myGlutKeyboard( value, 0, 0 );
+  myGlutKeyboard(value, 0, 0);
 }
 
 
@@ -175,7 +175,7 @@ void myGlutIdle()
   /* According to the GLUT specification, the current window is 
      undefined during an idle callback.  So we need to explicitly change
      it if necessary */
-  if ( glutGetWindow() != main_window ) 
+  if (glutGetWindow() != main_window) 
     glutSetWindow(main_window);  
 
   /*  GLUI_Master.sync_live_all();  -- not needed - nothing to sync in this
@@ -186,25 +186,25 @@ void myGlutIdle()
 
 /***************************************** myGlutMouse() **********/
 
-void myGlutMouse(int button, int button_state, int x, int y )
+void myGlutMouse(int button, int button_state, int x, int y)
 {
 }
 
 
 /***************************************** myGlutMotion() **********/
 
-void myGlutMotion(int x, int y )
+void myGlutMotion(int x, int y)
 {
   glutPostRedisplay(); 
 }
 
 /**************************************** myGlutReshape() *************/
 
-void myGlutReshape( int x, int y )
+void myGlutReshape(int x, int y)
 {
   int tx, ty, tw, th;
-  GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
-  glViewport( tx, ty, tw, th );
+  GLUI_Master.get_viewport_area(&tx, &ty, &tw, &th);
+  glViewport(tx, ty, tw, th);
 
   xy_aspect = (float)tw / (float)th;
 
@@ -215,30 +215,31 @@ void myGlutReshape( int x, int y )
 /************************************************** draw_axes() **********/
 /* Disables lighting, then draws RGB axes                                */
 
-void draw_axes( float scale )
+void draw_axes(float scale)
 {
-  glDisable( GL_LIGHTING );
+  glDisable(GL_LIGHTING);
 
   glPushMatrix();
-  glScalef( scale, scale, scale );
+  glScalef(scale, scale, scale);
 
-  glBegin( GL_LINES );
+  glBegin(GL_LINES);
  
-  glColor3f( 1.0, 0.0, 0.0 );
-  glVertex3f( .8f, 0.05f, 0.0 );  glVertex3f( 1.0, 0.25f, 0.0 ); /* Letter X */
-  glVertex3f( 0.8f, .25f, 0.0 );  glVertex3f( 1.0, 0.05f, 0.0 );
-  glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 1.0, 0.0, 0.0 ); /* X axis      */
+  glColor3f(1.0, 0.0, 0.0);
+  glVertex3f(.8f, 0.05f, 0.0);  glVertex3f(1.0, 0.25f, 0.0); /* Letter X */
+  glVertex3f(0.8f, .25f, 0.0);  glVertex3f(1.0, 0.05f, 0.0);
 
-  glColor3f( 0.0, 1.0, 0.0 );
-  glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 0.0, 1.0, 0.0 ); /* Y axis      */
+  glVertex3f(0.0, 0.0, 0.0);  glVertex3f(1.0, 0.0, 0.0); /* X axis      */
 
-  glColor3f( 0.0, 0.0, 1.0 );
-  glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 0.0, 0.0, 1.0 ); /* Z axis    */
+  glColor3f(0.0, 1.0, 0.0);
+  glVertex3f(0.0, 0.0, 0.0);  glVertex3f(0.0, 1.0, 0.0); /* Y axis      */
+
+  glColor3f(0.0, 0.0, 1.0);
+  glVertex3f(0.0, 0.0, 0.0);  glVertex3f(0.0, 0.0, 1.0); /* Z axis    */
   glEnd();
 
   glPopMatrix();
 
-  glEnable( GL_LIGHTING );
+  glEnable(GL_LIGHTING);
 }
 
 
@@ -246,72 +247,67 @@ void draw_axes( float scale )
 
 void myGlutDisplay()
 {
-  glClearColor( .9f, .9f, .9f, 1.0f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  glClearColor(.9f, .9f, .9f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glMatrixMode( GL_PROJECTION );
+  glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum( -xy_aspect*.04, xy_aspect*.04, -.04, .04, .1, 15.0 );
+  glFrustum(-xy_aspect*.04, xy_aspect*.04, -.04, .04, .1, 15.0);
 
-  glMatrixMode( GL_MODELVIEW );
+  glMatrixMode(GL_MODELVIEW);
 
   glLoadIdentity();
-  glMultMatrixf( lights_rotation );
+  glMultMatrixf(lights_rotation);
   glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
   
   glLoadIdentity();
-  glTranslatef( 0.0, 0.0, -2.6f );
-  glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] ); 
-  glMultMatrixf( view_rotate );
+  glTranslatef(0.0, 0.0, -2.6f);
+  glTranslatef(obj_pos[0], obj_pos[1], -obj_pos[2]); 
+  glMultMatrixf(view_rotate);
 
-  glScalef( scale, scale, scale );
+  glScalef(scale, scale, scale);
 
   /*** Now we render object, using the variables 'obj_type', 'segments', and
     'wireframe'.  These are _live_ variables, which are transparently 
     updated by GLUI ***/
 
   glPushMatrix();
-  glTranslatef( -.5, 0.0, 0.0 );
-  glMultMatrixf( cone_rotate );
-  if ( wireframe && show_cone)
-    glutWireCone( .4, .5, 16, segments );
-  else if ( show_cone )
-    glutSolidCone( .4, .5, 16, segments );
-  if ( show_axes )
+  glTranslatef(-.5, 0.0, 0.0);
+  glMultMatrixf(cone_rotate);
+  if (wireframe && show_cone)
+    glutWireCone(.4, .5, 16, segments);
+  else if (show_cone)
+    glutSolidCone(.4, .5, 16, segments);
+  if (show_axes)
     draw_axes(.52f);
   glPopMatrix();
 
   glPushMatrix();
-  glTranslatef( .5, 0.0, 0.0 );
-  glMultMatrixf( torus_rotate );
-  if ( wireframe && show_torus )
-    glutWireTorus( .15,.3,16,segments );
-  else if ( show_torus )
-    glutSolidTorus( .15,.3,16,segments );
-  if ( show_axes )
+  glTranslatef(.5, 0.0, 0.0);
+  glMultMatrixf(torus_rotate);
+  if (wireframe && show_torus)
+    glutWireTorus(.15, .3, 16, segments);
+  else if (show_torus)
+    glutSolidTorus(.15, .3, 16, segments);
+  if (show_axes)
     draw_axes(.52f);
   glPopMatrix();
 
-  if ( show_text ) 
+  if (show_text) 
   {
-    glDisable( GL_LIGHTING );  /* Disable lighting while we render text */
-    glMatrixMode( GL_PROJECTION );
+    glDisable(GL_LIGHTING);  /* Disable lighting while we render text */
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D( 0.0, 100.0, 0.0, 100.0  );
-    glMatrixMode( GL_MODELVIEW );
+    gluOrtho2D(0.0, 100.0, 0.0, 100.0 );
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glColor3ub( 0, 0, 0 );
-    glRasterPos2i( 10, 10 );
+    glColor3ub(0, 0, 0);
+    glRasterPos2i(10, 10);
 
-    /*  printf( "text: %s\n", text );              */
-
-    /*** Render the live character array 'text' ***/
-    int i;
-    for( i=0; i<(int)strlen( string_list[curr_string] ); i++ )
-      glutBitmapCharacter( GLUT_BITMAP_HELVETICA_18, string_list[curr_string][i] );
+    /*  printf("text: %s\n", text);              */
   }
 
-  glEnable( GL_LIGHTING );
+  glEnable(GL_LIGHTING);
 
 
   glutSwapBuffers(); 
@@ -327,17 +323,17 @@ int main(int argc, char* argv[])
   /****************************************/
 
   glutInit(&argc, argv);
-  glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
-  glutInitWindowPosition( 50, 50 );
-  glutInitWindowSize( 800, 600 );
+  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+  glutInitWindowPosition(50, 50);
+  glutInitWindowSize(800, 600);
  
-  main_window = glutCreateWindow( "GLUI Basic User Interface" );
-  glutDisplayFunc( myGlutDisplay );
-  GLUI_Master.set_glutReshapeFunc( myGlutReshape );  
-  GLUI_Master.set_glutKeyboardFunc( myGlutKeyboard );
-  GLUI_Master.set_glutSpecialFunc( NULL );
-  GLUI_Master.set_glutMouseFunc( myGlutMouse );
-  glutMotionFunc( myGlutMotion );
+  main_window = glutCreateWindow("GLUI Basic User Interface");
+  glutDisplayFunc(myGlutDisplay);
+  GLUI_Master.set_glutReshapeFunc(myGlutReshape);  
+  GLUI_Master.set_glutKeyboardFunc(myGlutKeyboard);
+  GLUI_Master.set_glutSpecialFunc(NULL);
+  GLUI_Master.set_glutMouseFunc(myGlutMouse);
+  glutMotionFunc(myGlutMotion);
 
   /****************************************/
   /*       Set up OpenGL lights           */
@@ -366,140 +362,121 @@ int main(int argc, char* argv[])
   /*         Here's the GLUI code         */
   /****************************************/
 
-  printf( "GLUI version: %3.2f\n", GLUI_Master.get_version() );
+  printf("GLUI version: %3.2f\n", GLUI_Master.get_version());
 
   /*** Create the side subwindow ***/
-  glui = GLUI_Master.create_glui_subwindow( main_window, 
-					    GLUI_SUBWINDOW_RIGHT );
+  glui = GLUI_Master.create_glui_subwindow(main_window, 
+					    GLUI_SUBWINDOW_RIGHT);
 
-  obj_panel = new GLUI_Rollout(glui, "Properties", false );
+  obj_panel = new GLUI_Rollout(glui, "Properties", false);
 
   /***** Control for object params *****/
 
-  new GLUI_Checkbox( obj_panel, "Wireframe", &wireframe, 1, control_cb );
+  new GLUI_Checkbox(obj_panel, "Wireframe", &wireframe, 1, control_cb);
   GLUI_Spinner *spinner = 
-    new GLUI_Spinner( obj_panel, "Segments:", &segments);
-  spinner->set_int_limits( 3, 60 );
-  spinner->set_alignment( GLUI_ALIGN_RIGHT );
+    new GLUI_Spinner(obj_panel, "Segments:", &segments);
+  spinner->set_int_limits(3, 60);
+  spinner->set_alignment(GLUI_ALIGN_RIGHT);
 
   GLUI_Spinner *scale_spinner = 
-    new GLUI_Spinner( obj_panel, "Scale:", &scale);
-  scale_spinner->set_float_limits( .2f, 4.0 );
-  scale_spinner->set_alignment( GLUI_ALIGN_RIGHT );
+    new GLUI_Spinner(obj_panel, "Scale:", &scale);
+  scale_spinner->set_float_limits(.2f, 4.0);
+  scale_spinner->set_alignment(GLUI_ALIGN_RIGHT);
 
 
   /******** Add some controls for lights ********/
 
-  GLUI_Rollout *roll_lights = new GLUI_Rollout(glui, "Lights", false );
+  GLUI_Rollout *roll_lights = new GLUI_Rollout(glui, "Lights", false);
 
-  GLUI_Panel *light0 = new GLUI_Panel( roll_lights, "Light 1" );
-  GLUI_Panel *light1 = new GLUI_Panel( roll_lights, "Light 2" );
+  GLUI_Panel *light0 = new GLUI_Panel(roll_lights, "Light 1");
+  GLUI_Panel *light1 = new GLUI_Panel(roll_lights, "Light 2");
 
-  new GLUI_Checkbox( light0, "Enabled", &light0_enabled,
-                     LIGHT0_ENABLED_ID, control_cb );
+  new GLUI_Checkbox(light0, "Enabled", &light0_enabled,
+                     LIGHT0_ENABLED_ID, control_cb);
   light0_spinner = 
-    new GLUI_Spinner( light0, "Intensity:", 
+    new GLUI_Spinner(light0, "Intensity:", 
                       &light0_intensity, LIGHT0_INTENSITY_ID,
-                      control_cb );
-  light0_spinner->set_float_limits( 0.0, 1.0 );
+                      control_cb);
+  light0_spinner->set_float_limits(0.0, 1.0);
   GLUI_Scrollbar *sb;
-  sb = new GLUI_Scrollbar( light0, "Red",GLUI_SCROLL_HORIZONTAL,
+  sb = new GLUI_Scrollbar(light0, "Red",GLUI_SCROLL_HORIZONTAL,
                            &light0_diffuse[0],LIGHT0_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
-  sb = new GLUI_Scrollbar( light0, "Green",GLUI_SCROLL_HORIZONTAL,
+  sb = new GLUI_Scrollbar(light0, "Green",GLUI_SCROLL_HORIZONTAL,
                            &light0_diffuse[1],LIGHT0_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
-  sb = new GLUI_Scrollbar( light0, "Blue",GLUI_SCROLL_HORIZONTAL,
+  sb = new GLUI_Scrollbar(light0, "Blue",GLUI_SCROLL_HORIZONTAL,
                            &light0_diffuse[2],LIGHT0_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
-  new GLUI_Checkbox( light1, "Enabled", &light1_enabled,
-                     LIGHT1_ENABLED_ID, control_cb );
+  new GLUI_Checkbox(light1, "Enabled", &light1_enabled,
+                     LIGHT1_ENABLED_ID, control_cb);
   light1_spinner = 
-    new GLUI_Spinner( light1, "Intensity:",
+    new GLUI_Spinner(light1, "Intensity:",
                       &light1_intensity, LIGHT1_INTENSITY_ID,
-                      control_cb );
-  light1_spinner->set_float_limits( 0.0, 1.0 );
-  sb = new GLUI_Scrollbar( light1, "Red",GLUI_SCROLL_HORIZONTAL,
+                      control_cb);
+  light1_spinner->set_float_limits(0.0, 1.0);
+  sb = new GLUI_Scrollbar(light1, "Red",GLUI_SCROLL_HORIZONTAL,
                            &light1_diffuse[0],LIGHT1_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
-  sb = new GLUI_Scrollbar( light1, "Green",GLUI_SCROLL_HORIZONTAL,
+  sb = new GLUI_Scrollbar(light1, "Green",GLUI_SCROLL_HORIZONTAL,
                            &light1_diffuse[1],LIGHT1_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
-  sb = new GLUI_Scrollbar( light1, "Blue",GLUI_SCROLL_HORIZONTAL,
+  sb = new GLUI_Scrollbar(light1, "Blue",GLUI_SCROLL_HORIZONTAL,
                            &light1_diffuse[2],LIGHT1_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
 
 
   /*** Add another rollout ***/
-  GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", true );
-  new GLUI_Checkbox( options, "Draw cone", &show_cone );
-  new GLUI_Checkbox( options, "Draw torus", &show_torus );
-  new GLUI_Checkbox( options, "Draw axes", &show_axes );
-  new GLUI_Checkbox( options, "Draw text", &show_text );
-
-  /**** Add listbox ****/
-  new GLUI_StaticText( glui, "" );
-  GLUI_Listbox *list = new GLUI_Listbox( glui, "Text:", &curr_string );
-  int i;
-  for( i=0; i<4; i++ )
-    list->add_item( i, string_list[i] );
-
-  new GLUI_StaticText( glui, "" );
-
-
-  /*** Disable/Enable buttons ***/
-  new GLUI_Button( glui, "Disable movement", DISABLE_ID, control_cb );
-  new GLUI_Button( glui, "Enable movement", ENABLE_ID, control_cb );
-  new GLUI_Button( glui, "Hide", HIDE_ID, control_cb );
-  new GLUI_Button( glui, "Show", SHOW_ID, control_cb );
-
-  new GLUI_StaticText( glui, "" );
+  GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", true);
+  new GLUI_Checkbox(options, "Draw cone", &show_cone);
+  new GLUI_Checkbox(options, "Draw torus", &show_torus);
+  new GLUI_Checkbox(options, "Draw axes", &show_axes);
+  /*new GLUI_Checkbox(options, "Draw text", &show_text);*/
 
   /****** A 'quit' button *****/
-  new GLUI_Button( glui, "Quit", 0,(GLUI_Update_CB)exit );
-
+  new GLUI_Button(glui, "Quit", 0,(GLUI_Update_CB)exit);
 
   /**** Link windows to GLUI, and register idle callback ******/
   
-  glui->set_main_gfx_window( main_window );
+  glui->set_main_gfx_window(main_window);
 
 
   /*** Create the bottom subwindow ***/
-  glui2 = GLUI_Master.create_glui_subwindow( main_window, 
-                                             GLUI_SUBWINDOW_BOTTOM );
-  glui2->set_main_gfx_window( main_window );
+  glui2 = GLUI_Master.create_glui_subwindow(main_window, 
+                                             GLUI_SUBWINDOW_BOTTOM);
+  glui2->set_main_gfx_window(main_window);
 
-  GLUI_Rotation *view_rot = new GLUI_Rotation(glui2, "Objects", view_rotate );
-  view_rot->set_spin( 1.0 );
-  new GLUI_Column( glui2, false );
-  GLUI_Rotation *sph_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate );
-  sph_rot->set_spin( .98 );
-  new GLUI_Column( glui2, false );
-  GLUI_Rotation *tor_rot = new GLUI_Rotation(glui2, "Torus", torus_rotate );
-  tor_rot->set_spin( .98 );
-  new GLUI_Column( glui2, false );
-  GLUI_Rotation *lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation );
-  lights_rot->set_spin( .82 );
-  new GLUI_Column( glui2, false );
+  GLUI_Rotation *view_rot = new GLUI_Rotation(glui2, "Objects", view_rotate);
+  view_rot->set_spin(1.0);
+  new GLUI_Column(glui2, false);
+  GLUI_Rotation *sph_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
+  sph_rot->set_spin(.98);
+  new GLUI_Column(glui2, false);
+  GLUI_Rotation *tor_rot = new GLUI_Rotation(glui2, "Torus", torus_rotate);
+  tor_rot->set_spin(.98);
+  new GLUI_Column(glui2, false);
+  GLUI_Rotation *lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation);
+  lights_rot->set_spin(.82);
+  new GLUI_Column(glui2, false);
   GLUI_Translation *trans_xy = 
-    new GLUI_Translation(glui2, "Objects XY", GLUI_TRANSLATION_XY, obj_pos );
-  trans_xy->set_speed( .005 );
-  new GLUI_Column( glui2, false );
+    new GLUI_Translation(glui2, "Objects XY", GLUI_TRANSLATION_XY, obj_pos);
+  trans_xy->set_speed(.005);
+  new GLUI_Column(glui2, false);
   GLUI_Translation *trans_x = 
-    new GLUI_Translation(glui2, "Objects X", GLUI_TRANSLATION_X, obj_pos );
-  trans_x->set_speed( .005 );
-  new GLUI_Column( glui2, false );
+    new GLUI_Translation(glui2, "Objects X", GLUI_TRANSLATION_X, obj_pos);
+  trans_x->set_speed(.005);
+  new GLUI_Column(glui2, false);
   GLUI_Translation *trans_y = 
-    new GLUI_Translation( glui2, "Objects Y", GLUI_TRANSLATION_Y, &obj_pos[1] );
-  trans_y->set_speed( .005 );
-  new GLUI_Column( glui2, false );
+    new GLUI_Translation(glui2, "Objects Y", GLUI_TRANSLATION_Y, &obj_pos[1]);
+  trans_y->set_speed(.005);
+  new GLUI_Column(glui2, false);
   GLUI_Translation *trans_z = 
-    new GLUI_Translation( glui2, "Objects Z", GLUI_TRANSLATION_Z, &obj_pos[2] );
-  trans_z->set_speed( .005 );
+    new GLUI_Translation(glui2, "Objects Z", GLUI_TRANSLATION_Z, &obj_pos[2]);
+  trans_z->set_speed(.005);
 
 #if 0
   /**** We register the idle callback with GLUI, *not* with GLUT ****/
-  GLUI_Master.set_glutIdleFunc( myGlutIdle );
+  GLUI_Master.set_glutIdleFunc(myGlutIdle);
 #endif
 
   /**** Regular GLUT main loop ****/
