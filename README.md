@@ -31,14 +31,14 @@ And it would be nice to leverage some OpenGL primitives (like glMap1f() and glEv
 
     //          +-- Triggers generation of glVertex3 commands by evaluator.
     //          |
-    //          |              +-- min parametric value, i think ;-)
+    //          |              +-- min parametric value
     //          |              |
     //          |              |    +-- max parametric value
     //          |              |    |
     //          |              |    |   +-- stride, # of values between gBezierControlPoints.
     //          |              |    |   |   So a 3d control point will have x, y, z
     //          |              |    |   |   values between control point boundaries,
-    //          |              |    |   |   or a stried of 3
+    //          |              |    |   |   or a stride of 3
     //          |              |    |   |
     //          |              |    |   |  +-- number of control points
     //          |              |    |   |  |
