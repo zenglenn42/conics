@@ -31,6 +31,7 @@ PROGRAMS  = $(BUILD_DIR)/hello-spinner
 PROGRAMS += $(BUILD_DIR)/hello-checkbox
 PROGRAMS += $(BUILD_DIR)/hello-motion
 PROGRAMS += $(BUILD_DIR)/hello-ui
+PROGRAMS += $(BUILD_DIR)/hello-ui-1
 
 BUILD_DIR = build
 GENERATED_MAKEFILE = $(BUILD_DIR)/Makefile

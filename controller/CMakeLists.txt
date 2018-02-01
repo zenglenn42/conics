@@ -20,3 +20,6 @@ target_link_libraries(hello-motion glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_
 
 add_executable(hello-ui hello-ui.cpp)
 target_link_libraries(hello-ui glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+add_executable(hello-ui-1 hello-ui-1.cpp)
+target_link_libraries(hello-ui-1 glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})

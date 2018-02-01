@@ -1,20 +1,22 @@
 /****************************************************************************
   
-  hello-ui
+  hello-ui-1
 
   A GLUI program demonstrating subwindows, rotation controls, translation 
   controls, and listboxes
 
+  This version adds a double cone and reset button.
   -----------------------------------------------------------------------
 
   This is an altered version of code written by:
 
   7/10/98 Paul Rademacher (rademach@cs.unc.edu)
 
-  and packaged up as example1 in the GLUI user interface toolkit (ver 2.37).
+  in the GLUI user interface toolkit (ver 2.37).
 
 ****************************************************************************/
 
+#include <iostream>
 #include <string.h>
 #include <GL/glui.h>
 
@@ -27,6 +29,8 @@
 float xy_aspect;
 int   last_x, last_y;
 float rotationX = 0.0, rotationY = 0.0;
+float ball_radius = 1.35;
+
 
 /** These are the live variables passed into GLUI ***/
 int   wireframe = 0;
@@ -43,12 +47,17 @@ int   show_cone = 1;
 int   show_torus=1;
 int   show_axes = 1;
 int   show_text = 0;
+float rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float cone_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float torus_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float view_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float obj_pos[] = { 0.0, 0.0, 0.0 };
 const char *string_list[] = { "Hello World!", "Foo", "Testing...", "Bounding box: on" };
 int   curr_string = 0;
+GLUI_Rotation *view_rot;
+GLUI_Rotation *sph_rot;
+GLUI_Rotation *tor_rot;
+GLUI_Rotation *lights_rot;
 
 /** Pointers to the windows and some of the controls we'll create **/
 GLUI *glui, *glui2;
@@ -274,10 +283,22 @@ void myGlutDisplay()
   glPushMatrix();
   glTranslatef(-.5, 0.0, 0.0);
   glMultMatrixf(cone_rotate);
-  if (wireframe && show_cone)
-    glutWireCone(.4, .5, 16, segments);
-  else if (show_cone)
-    glutSolidCone(.4, .5, 16, segments);
+  glPushMatrix();
+    glRotatef(-90.0, 1.0, 0.0, 0.0);
+    glTranslatef(0.0, 0.0, -0.4);
+    if (wireframe && show_cone)
+      glutWireCone(.4, .4, 16, segments);
+    else if (show_cone)
+      glutSolidCone(.4, .4, 16, segments);
+  glPopMatrix();
+  glPushMatrix();
+    glRotatef(90.0, 1.0, 0.0, 0.0);
+    glTranslatef(0.0, 0.0, -0.4);
+    if (wireframe && show_cone)
+      glutWireCone(.4, .4, 16, segments);
+    else if (show_cone)
+      glutSolidCone(.4, .4, 16, segments);
+  glPopMatrix();
   if (show_axes)
     draw_axes(.52f);
   glPopMatrix();
@@ -311,6 +332,43 @@ void myGlutDisplay()
 
 
   glutSwapBuffers(); 
+}
+
+int reset() {
+    wireframe = 0;
+    obj_type = 1;
+    segments = 8;
+    segments2 = 8;
+    light0_enabled = 1;
+    light1_enabled = 1;
+    light0_intensity = 1.0;
+    light1_intensity = .4;
+    scale = 1.0;
+    show_cone = 1;
+    show_torus=1;
+    show_axes = 1;
+    show_text = 0;
+    obj_pos[0] = 0.0;
+    obj_pos[1] = 0.0;
+    obj_pos[2] = 0.0;
+    for (int i = 0; i < 16; i++) {
+      cone_rotate[i] = torus_rotate[i] = view_rotate[i] = rotate[i];
+    }
+    std::cout << "reset" << std::endl;
+    view_rot->reset();
+    view_rot->init_ball();
+    view_rot->draw_ball(ball_radius);
+    sph_rot->reset();
+    sph_rot->init_ball();
+    sph_rot->draw_ball(ball_radius);
+    tor_rot->reset();
+    tor_rot->init_ball();
+    tor_rot->draw_ball(ball_radius);
+    lights_rot->reset();
+    lights_rot->init_ball();
+    lights_rot->draw_ball(ball_radius);
+    glutPostRedisplay();
+    return 1;
 }
 
 
@@ -434,6 +492,7 @@ int main(int argc, char* argv[])
   /*new GLUI_Checkbox(options, "Draw text", &show_text);*/
 
   /****** A 'quit' button *****/
+  new GLUI_Button(glui, "Reset", 0,(GLUI_Update_CB)reset);
   new GLUI_Button(glui, "Quit", 0,(GLUI_Update_CB)exit);
 
   /**** Link windows to GLUI, and register idle callback ******/
@@ -446,16 +505,17 @@ int main(int argc, char* argv[])
                                              GLUI_SUBWINDOW_BOTTOM);
   glui2->set_main_gfx_window(main_window);
 
-  GLUI_Rotation *view_rot = new GLUI_Rotation(glui2, "Objects", view_rotate);
+  view_rot = new GLUI_Rotation(glui2, "Objects", view_rotate);
   view_rot->set_spin(1.0);
   new GLUI_Column(glui2, false);
-  GLUI_Rotation *sph_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
+  sph_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
   sph_rot->set_spin(.98);
   new GLUI_Column(glui2, false);
-  GLUI_Rotation *tor_rot = new GLUI_Rotation(glui2, "Torus", torus_rotate);
+  tor_rot = new GLUI_Rotation(glui2, "Torus", torus_rotate);
   tor_rot->set_spin(.98);
+
   new GLUI_Column(glui2, false);
-  GLUI_Rotation *lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation);
+  lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation);
   lights_rot->set_spin(.82);
   new GLUI_Column(glui2, false);
   GLUI_Translation *trans_xy = 
