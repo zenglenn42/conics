@@ -32,6 +32,7 @@ PROGRAMS += $(BUILD_DIR)/hello-checkbox
 PROGRAMS += $(BUILD_DIR)/hello-motion
 PROGRAMS += $(BUILD_DIR)/hello-ui
 PROGRAMS += $(BUILD_DIR)/hello-ui-1
+PROGRAMS += $(BUILD_DIR)/hello-conics
 
 BUILD_DIR = build
 GENERATED_MAKEFILE = $(BUILD_DIR)/Makefile
