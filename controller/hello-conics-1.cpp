@@ -5,7 +5,13 @@
   A GLUI program demonstrating subwindows, rotation controls, translation 
   controls, and listboxes
 
-  This version adds a double cone and reset button.
+  This version includes:
+
+	double cone
+	reset button
+	rgb sliders for plane color
+	slider for cone generator angle
+	
   -----------------------------------------------------------------------
 
   This is an altered version of code written by:
