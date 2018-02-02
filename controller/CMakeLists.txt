@@ -35,3 +35,7 @@ target_link_libraries(hello-ui-1 glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LI
 set(hello-conics_SRCS hello-conics.cpp)
 add_executable(hello-conics ${hello-conics_SRCS})
 target_link_libraries(hello-conics glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+set(hello-conics-1_SRCS hello-conics-1.cpp)
+add_executable(hello-conics-1 ${hello-conics-1_SRCS})
+target_link_libraries(hello-conics-1 glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
