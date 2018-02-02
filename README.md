@@ -94,6 +94,10 @@ Add slider control for variable cone generator angle.
 
 ![alt tag](controller/img/hello-conics-1.png)
 
-But get the transparency part working for the plane.
+Get transparency slider working for plane.
 
 ![alt tag](controller/img/hello-conics-2.png)
+
+Add pre-set conic section buttons.
+
+![alt tag](controller/img/hello-conics-3.png)

@@ -34,6 +34,7 @@
 #include <GL/glut.h>
 #endif
 
+int reset();
 float xy_aspect;
 int   last_x, last_y;
 float rotationX = 0.0, rotationY = 0.0;
@@ -66,14 +67,15 @@ int   show_text = 0;
 float rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float cone_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float plane_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
+//float plane_rotate[16] = { 1,0,0,0, 0,cos(3.14159/4.0),-sin(3.14159/4.0),0, 0,sin(3.14159/4.0),cos(3.14159/4.0),0, 0,cone_height/2.0,0,1 };
 float view_rotate[16] = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 float obj_pos[] = { 0.0, 0.0, 0.0 };
 float plane_pos[] = { 0.0, 0.0, 0.0 };
 const char *string_list[] = { "Hello World!", "Foo", "Testing...", "Bounding box: on" };
 int   curr_string = 0;
 GLUI_Rotation *view_rot;
-GLUI_Rotation *sph_rot;
-GLUI_Rotation *tor_rot;
+GLUI_Rotation *cone_rot;
+GLUI_Rotation *pln_rot;
 GLUI_Rotation *lights_rot;
 
 /** Pointers to the windows and some of the controls we'll create **/
@@ -93,7 +95,10 @@ GLUI_Panel      *obj_panel;
 #define DISABLE_ID           301
 #define SHOW_ID              302
 #define HIDE_ID              303
-
+#define PARABOLA_ID          290
+#define ELIPSE_ID            291
+#define CIRCLE_ID            292
+#define HYPERBOLA_ID         293
 
 /********** Miscellaneous global variables **********/
 
@@ -118,6 +123,41 @@ void control_cb(int control)
   if (control == PLANE_COLOR_ID) {
     /*
     */
+  }
+  else if (control == PARABOLA_ID) {
+    reset();
+    plane_rotate[0] = 1; plane_rotate[1] = 0; plane_rotate[2] = 0; plane_rotate[3] = 0;
+    plane_rotate[4] = 0; plane_rotate[5] = cos(cone_angle); plane_rotate[6] = -sin(cone_angle); plane_rotate[7] = 0;
+    plane_rotate[8] = 0; plane_rotate[9] = sin(cone_angle); plane_rotate[10] = cos(cone_angle); plane_rotate[11] = 0;
+    plane_rotate[12] = 0; plane_rotate[13] = cone_height/2.0; plane_rotate[14] = 0; plane_rotate[15] = 1;
+    glutPostRedisplay();
+  }
+  else if (control == ELIPSE_ID) {
+    reset();
+    float f = 1.5;
+    plane_rotate[0] = 1; plane_rotate[1] = 0; plane_rotate[2] = 0; plane_rotate[3] = 0;
+    plane_rotate[4] = 0; plane_rotate[5] = cos(f*cone_angle); plane_rotate[6] = -sin(f*cone_angle); plane_rotate[7] = 0;
+    plane_rotate[8] = 0; plane_rotate[9] = sin(f*cone_angle); plane_rotate[10] = cos(f*cone_angle); plane_rotate[11] = 0;
+    plane_rotate[12] = 0; plane_rotate[13] = cone_height/2.0; plane_rotate[14] = 0; plane_rotate[15] = 1;
+    glutPostRedisplay();
+  }
+  else if (control == CIRCLE_ID) {
+    reset();
+    float f = 2.0;
+    plane_rotate[0] = 1; plane_rotate[1] = 0; plane_rotate[2] = 0; plane_rotate[3] = 0;
+    plane_rotate[4] = 0; plane_rotate[5] = cos(f*cone_angle); plane_rotate[6] = -sin(f*cone_angle); plane_rotate[7] = 0;
+    plane_rotate[8] = 0; plane_rotate[9] = sin(f*cone_angle); plane_rotate[10] = cos(f*cone_angle); plane_rotate[11] = 0;
+    plane_rotate[12] = 0; plane_rotate[13] = cone_height/2.0; plane_rotate[14] = 0; plane_rotate[15] = 1;
+    glutPostRedisplay();
+  }
+  else if (control == HYPERBOLA_ID) {
+    reset();
+    float f = 0.0;
+    plane_rotate[0] = 1; plane_rotate[1] = 0; plane_rotate[2] = 0; plane_rotate[3] = 0;
+    plane_rotate[4] = 0; plane_rotate[5] = cos(f*cone_angle); plane_rotate[6] = -sin(f*cone_angle); plane_rotate[7] = 0;
+    plane_rotate[8] = 0; plane_rotate[9] = sin(f*cone_angle); plane_rotate[10] = cos(f*cone_angle); plane_rotate[11] = 0;
+    plane_rotate[12] = 0; plane_rotate[13] = 0; plane_rotate[14] = cone_width/4.0; plane_rotate[15] = 1;
+    glutPostRedisplay();
   }
   else if (control == CONE_ANGLE_ID) {
     cone_width = (2.0 * cone_height) / tan(cone_angle);
@@ -421,12 +461,12 @@ int reset() {
     view_rot->reset();
     view_rot->init_ball();
     view_rot->draw_ball(ball_radius);
-    sph_rot->reset();
-    sph_rot->init_ball();
-    sph_rot->draw_ball(ball_radius);
-    tor_rot->reset();
-    tor_rot->init_ball();
-    tor_rot->draw_ball(ball_radius);
+    cone_rot->reset();
+    cone_rot->init_ball();
+    cone_rot->draw_ball(ball_radius);
+    pln_rot->reset();
+    pln_rot->init_ball();
+    pln_rot->draw_ball(ball_radius);
     //lights_rot->reset();
     //lights_rot->init_ball();
     //lights_rot->draw_ball(ball_radius);
@@ -503,20 +543,13 @@ int main(int argc, char* argv[])
   glui = GLUI_Master.create_glui_subwindow(main_window, 
 					    GLUI_SUBWINDOW_RIGHT);
 
-  obj_panel = new GLUI_Rollout(glui, "Properties", false);
+  /******** Add some controls for pre-set conics ********/
 
-  /***** Control for object params *****/
-
-  new GLUI_Checkbox(obj_panel, "Wireframe", &wireframe, 1, control_cb);
-  GLUI_Spinner *spinner = 
-    new GLUI_Spinner(obj_panel, "Segments:", &segments);
-  spinner->set_int_limits(3, 60);
-  spinner->set_alignment(GLUI_ALIGN_RIGHT);
-
-  GLUI_Spinner *scale_spinner = 
-    new GLUI_Spinner(obj_panel, "Scale:", &scale);
-  scale_spinner->set_float_limits(.2f, 4.0);
-  scale_spinner->set_alignment(GLUI_ALIGN_RIGHT);
+  GLUI_Rollout *roll_conics = new GLUI_Rollout(glui, "Conics", true);
+  new GLUI_Button(roll_conics, "parabola", PARABOLA_ID, control_cb);
+  new GLUI_Button(roll_conics, "elipse", ELIPSE_ID, control_cb);
+  new GLUI_Button(roll_conics, "circle", CIRCLE_ID, control_cb);
+  new GLUI_Button(roll_conics, "hyperbola", HYPERBOLA_ID, control_cb);
 
   /******** Add some controls for plane ********/
 
@@ -593,9 +626,23 @@ int main(int argc, char* argv[])
                            &light1_diffuse[2],LIGHT1_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
 
+  obj_panel = new GLUI_Rollout(glui, "Properties", false);
+
+  /***** Control for object params *****/
+
+  new GLUI_Checkbox(obj_panel, "Wireframe", &wireframe, 1, control_cb);
+  GLUI_Spinner *spinner = 
+    new GLUI_Spinner(obj_panel, "Segments:", &segments);
+  spinner->set_int_limits(3, 60);
+  spinner->set_alignment(GLUI_ALIGN_RIGHT);
+
+  GLUI_Spinner *scale_spinner = 
+    new GLUI_Spinner(obj_panel, "Scale:", &scale);
+  scale_spinner->set_float_limits(.2f, 4.0);
+  scale_spinner->set_alignment(GLUI_ALIGN_RIGHT);
 
   /*** Add another rollout ***/
-  GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", true);
+  GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", false);
   new GLUI_Checkbox(options, "Draw axes", &show_axes);
   /*new GLUI_Checkbox(options, "Draw text", &show_text);*/
 
@@ -616,11 +663,11 @@ int main(int argc, char* argv[])
   view_rot = new GLUI_Rotation(glui2, "Both", view_rotate);
   view_rot->set_spin(1.0);
   new GLUI_Column(glui2, false);
-  sph_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
-  sph_rot->set_spin(.98);
+  cone_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
+  cone_rot->set_spin(.98);
   new GLUI_Column(glui2, false);
-  tor_rot = new GLUI_Rotation(glui2, "Plane", plane_rotate);
-  tor_rot->set_spin(.98);
+  pln_rot = new GLUI_Rotation(glui2, "Plane", plane_rotate);
+  pln_rot->set_spin(.98);
 
   new GLUI_Column(glui2, false);
   GLUI_Translation *ptrans_y = 
