@@ -6,20 +6,28 @@ find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glui REQUIRED)
 
-set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
+if(APPLE)
+  set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
+endif(APPLE)
+
 set(CMAKE_VERBOSE_MAKEFILE on)
 
-add_executable(hello-spinner hello-spinner.cpp)
+set(hello-spinner_SRCS hello-spinner.cpp)
+add_executable(hello-spinner ${hello-spinner_SRCS})
 target_link_libraries(hello-spinner glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
-add_executable(hello-checkbox hello-checkbox.cpp)
+set(hello-checkbox_SRCS hello-checkbox.cpp)
+add_executable(hello-checkbox ${hello-checkbox_SRCS})
 target_link_libraries(hello-checkbox glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
-add_executable(hello-motion hello-motion.cpp)
+set(hello-motion_SRCS hello-motion.cpp)
+add_executable(hello-motion ${hello-motion_SRCS})
 target_link_libraries(hello-motion glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
-add_executable(hello-ui hello-ui.cpp)
+set(hello-ui_SRCS hello-ui.cpp)
+add_executable(hello-ui ${hello-ui_SRCS})
 target_link_libraries(hello-ui glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
-add_executable(hello-ui-1 hello-ui-1.cpp)
+set(hello-ui-1_SRCS hello-ui-1.cpp)
+add_executable(hello-ui-1 ${hello-ui-1_SRCS})
 target_link_libraries(hello-ui-1 glui::glui_static ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
