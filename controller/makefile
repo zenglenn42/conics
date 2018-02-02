@@ -34,6 +34,7 @@ PROGRAMS += $(BUILD_DIR)/hello-ui
 PROGRAMS += $(BUILD_DIR)/hello-ui-1
 PROGRAMS += $(BUILD_DIR)/hello-conics
 PROGRAMS += $(BUILD_DIR)/hello-conics-1
+PROGRAMS += $(BUILD_DIR)/hello-conics-2
 
 BUILD_DIR = build
 GENERATED_MAKEFILE = $(BUILD_DIR)/Makefile

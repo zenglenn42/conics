@@ -93,3 +93,7 @@ Teach a plane to intersect a cone at any angle and offset to make conics section
 Add slider control for variable cone generator angle.
 
 ![alt tag](controller/img/hello-conics-1.png)
+
+But get the transparency part working for the plane.
+
+![alt tag](controller/img/hello-conics-2.png)
