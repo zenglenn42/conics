@@ -89,3 +89,7 @@ And here are the rudiments of a nice little user interface, ready to modify.
 Teach a plane to intersect a cone at any angle and offset to make conics sections.
 
 ![alt tag](controller/img/hello-conics.png)
+
+Add slider control for variable cone generator angle.
+
+![alt tag](controller/img/hello-conics-1.png)

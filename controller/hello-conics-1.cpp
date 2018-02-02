@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string.h>
 #include <GL/glui.h>
+#include <cmath>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -30,6 +31,10 @@ float xy_aspect;
 int   last_x, last_y;
 float rotationX = 0.0, rotationY = 0.0;
 float ball_radius = 1.35;
+float cone_width = 0.4;
+float cone_height = 0.4;
+float max_cone_width = cone_height;
+GLfloat cone_angle = atan(cone_height/cone_width);
 
 
 /** These are the live variables passed into GLUI ***/
@@ -72,6 +77,7 @@ GLUI_Panel      *obj_panel;
 #define LIGHT0_INTENSITY_ID  250
 #define LIGHT1_INTENSITY_ID  260
 #define PLANE_COLOR_ID       270
+#define CONE_ANGLE_ID        280
 #define ENABLE_ID            300
 #define DISABLE_ID           301
 #define SHOW_ID              302
@@ -90,7 +96,7 @@ GLfloat light1_position[] = {-1.0f, -1.0f, 1.0f, 0.0f};
 
 GLfloat lights_rotation[16] = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
 
-GLfloat plane_color[] = {1.0, 0.0, 1.0};
+GLfloat plane_color[] = {0.0, 0.5, 1.0, 0.0};
 
 /**************************************** control_cb() *******************/
 /* GLUI control callback                                                 */
@@ -99,16 +105,10 @@ void control_cb(int control)
 {
   if (control == PLANE_COLOR_ID) {
     /*
-    float v[] = { 
-      light0_diffuse[0],  light0_diffuse[1],
-      light0_diffuse[2],  light0_diffuse[3] };
-    
-    v[0] *= light0_intensity;
-    v[1] *= light0_intensity;
-    v[2] *= light0_intensity;
-
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, v);
     */
+  }
+  else if (control == CONE_ANGLE_ID) {
+    cone_width = (2.0 * cone_height) / tan(cone_angle);
   }
   else if (control == LIGHT0_ENABLED_ID) {
     if (light0_enabled) {
@@ -275,7 +275,7 @@ void draw_plane(float scale, GLfloat plane_color[])
   glPushMatrix(); 
   glScalef(scale, scale, scale);
   
-  glColor3fv(plane_color);
+  glColor4fv(plane_color);
   glBegin(GL_QUADS);
     glVertex3f(-1.0, 1.0, 0.0); 
     glVertex3f(-1.0, -1.0, 0.0); 
@@ -325,17 +325,17 @@ void myGlutDisplay()
     glRotatef(-90.0, 1.0, 0.0, 0.0);
     glTranslatef(0.0, 0.0, -0.4);
     if (wireframe && show_cone)
-      glutWireCone(.4, .4, 16, segments);
+      glutWireCone(cone_width, cone_height, 16, segments);
     else if (show_cone)
-      glutSolidCone(.4, .4, 16, segments);
+      glutSolidCone(cone_width, cone_height, 16, segments);
   glPopMatrix();
   glPushMatrix();
     glRotatef(90.0, 1.0, 0.0, 0.0);
     glTranslatef(0.0, 0.0, -0.4);
     if (wireframe && show_cone)
-      glutWireCone(.4, .4, 16, segments);
+      glutWireCone(cone_width, cone_height, 16, segments);
     else if (show_cone)
-      glutSolidCone(.4, .4, 16, segments);
+      glutSolidCone(cone_width, cone_height, 16, segments);
   glPopMatrix();
   if (show_axes)
     draw_axes(.52f);
@@ -408,6 +408,13 @@ int reset() {
     //lights_rot->reset();
     //lights_rot->init_ball();
     //lights_rot->draw_ball(ball_radius);
+    plane_color[0] = 0.0;
+    plane_color[1] = 0.5;
+    plane_color[2] = 1.0;
+    plane_color[3] = 0.0;
+    cone_width = 0.4;
+    cone_angle = atan(cone_height / cone_width);
+
     glutPostRedisplay();
     return 1;
 }
@@ -487,7 +494,7 @@ int main(int argc, char* argv[])
   GLUI_Rollout *roll_plane = new GLUI_Rollout(glui, "Plane", false);
   new GLUI_Checkbox(roll_plane, "Draw plane", &show_plane);
 
-  GLUI_Panel *color_panel = new GLUI_Panel(roll_plane, "Color (RGB)");
+  GLUI_Panel *color_panel = new GLUI_Panel(roll_plane, "Color (RGBA)");
   GLUI_Scrollbar *psb;
   psb = new GLUI_Scrollbar(color_panel, "Red",GLUI_SCROLL_HORIZONTAL,
                            &plane_color[0],PLANE_COLOR_ID,control_cb);
@@ -498,6 +505,21 @@ int main(int argc, char* argv[])
   psb = new GLUI_Scrollbar(color_panel, "Blue",GLUI_SCROLL_HORIZONTAL,
                            &plane_color[2],PLANE_COLOR_ID,control_cb);
   psb->set_float_limits(0,1);
+  psb = new GLUI_Scrollbar(color_panel, "Alpha",GLUI_SCROLL_HORIZONTAL,
+                           &plane_color[3],PLANE_COLOR_ID,control_cb);
+  psb->set_float_limits(0,1);
+
+  /******** Add some controls for cone ********/
+
+  GLUI_Rollout *roll_cone = new GLUI_Rollout(glui, "Cone", false);
+  new GLUI_Checkbox(roll_cone, "Draw cone", &show_cone);
+
+  GLUI_Panel *angle_panel = new GLUI_Panel(roll_cone, "Angle (0 - 45)");
+  GLUI_Scrollbar *asb;
+  asb = new GLUI_Scrollbar(angle_panel, "Angle",GLUI_SCROLL_HORIZONTAL,
+                           &cone_angle,CONE_ANGLE_ID,control_cb);
+  float min_cone_angle = atan(cone_height / (max_cone_width / 2.0));
+  asb->set_float_limits(3.14159/2.0, min_cone_angle);
 
   /******** Add some controls for lights ********/
 
@@ -543,7 +565,6 @@ int main(int argc, char* argv[])
 
   /*** Add another rollout ***/
   GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", true);
-  new GLUI_Checkbox(options, "Draw cone", &show_cone);
   new GLUI_Checkbox(options, "Draw axes", &show_axes);
   /*new GLUI_Checkbox(options, "Draw text", &show_text);*/
 
