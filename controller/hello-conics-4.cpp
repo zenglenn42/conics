@@ -13,6 +13,7 @@
         slider for cone generator angle
         attempt at transparency
         pre-configured conic buttons (parabola, elipse, hyperbola)
+        Y and Z axis labels
 	
   -----------------------------------------------------------------------
 
@@ -316,6 +317,11 @@ void draw_axes(float scale)
   glVertex3f(0.0, 0.0, 0.0);  glVertex3f(0.0, 1.0, 0.0); /* Y axis      */
 
   glColor3f(0.0, 0.0, 1.0);
+  glVertex3f(.05f, 0.0, .8f); glVertex3f(.25f, 0.0, .8f); /* Letter Z */
+  glVertex3f(.25f, 0.0, .8f); glVertex3f(0.05f, 0.0, 1.0f); 
+  glVertex3f(.05f, 0.0, 1.0f); glVertex3f(.25f, 0.0, 1.0f); 
+  glVertex3f(0.137f, 0.9f, 0.0); glVertex3f(0.05, 1.0f, 0.0);
+
   glVertex3f(0.0, 0.0, 0.0);  glVertex3f(0.0, 0.0, 1.0); /* Z axis    */
   glEnd();
 

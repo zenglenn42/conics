@@ -52,11 +52,17 @@ CMAKE = cmake
 #-----------------------------------------------------------------
 all: $(GENERATED_MAKEFILE) $(PROGRAMS)
 
-example = $(filter $(BUILD_DIR)/example1, $(PROGRAMS))
-
 $(PROGRAMS): $(BUILD_DIR)/% : %.cpp | $(GENERATED_MAKEFILE)
 	@echo building $@ from $?
 	cd $(BUILD_DIR) && make $(?:.cpp=)
+
+PSEUDO_PROGRAMS = $(patsubst $(BUILD_DIR)/%, %, $(PROGRAMS))
+$(PSEUDO_PROGRAMS):
+	$(MAKE) $(BUILD_DIR)/$@
+	@if [ -f "$(BUILD_DIR)/$@" ]; then \
+		echo Built target $(BUILD_DIR)/$@ ;\
+		echo ;\
+	fi
 
 $(GENERATED_MAKEFILE): $(CMAKEFILE) | $(BUILD_DIR)
 	@echo building $@ ...
