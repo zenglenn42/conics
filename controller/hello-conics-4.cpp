@@ -1,16 +1,16 @@
 /****************************************************************************
   
-  hello-conics-3
+  hello-conics-4
 
   A GLUI program demonstrating subwindows, rotation controls, translation 
   controls, and listboxes
 
   This version includes:
 
-	double cone
-	reset button
-	rgb sliders for plane color
-	slider for cone generator angle
+        double cone
+        reset button
+        rgb sliders for plane color
+        slider for cone generator angle
         attempt at transparency
         pre-configured conic buttons (parabola, elipse, hyperbola)
 	
@@ -60,7 +60,7 @@ int   light1_enabled = 1;
 float light0_intensity = 1.0;
 float light1_intensity = 1.0;
 int   main_window;
-float scale = 1.0;
+float scale = 1.25;
 int   show_cone = 1;
 int   show_plane = 1;
 int   show_axes = 1;
@@ -445,7 +445,7 @@ int reset() {
     light1_enabled = 1;
     light0_intensity = 1.0;
     light1_intensity = 1.0;
-    scale = 1.0;
+    scale = 1.25;
     show_cone = 1;
     show_plane=1;
     show_axes = 1;
@@ -552,6 +552,24 @@ int main(int argc, char* argv[])
   new GLUI_Button(roll_conics, "circle", CIRCLE_ID, control_cb);
   new GLUI_Button(roll_conics, "hyperbola", HYPERBOLA_ID, control_cb);
 
+  /******** Add some controls for cone ********/
+
+  GLUI_Rollout *roll_cone = new GLUI_Rollout(glui, "Cone", false);
+  new GLUI_Checkbox(roll_cone, "Draw cone", &show_cone);
+
+  GLUI_Panel *angle_panel = new GLUI_Panel(roll_cone, "Angle (0 - 45)");
+  GLUI_Scrollbar *asb;
+  asb = new GLUI_Scrollbar(angle_panel, "Angle",GLUI_SCROLL_HORIZONTAL,
+                           &cone_angle,CONE_ANGLE_ID,control_cb);
+  float min_cone_angle = atan(cone_height / (max_cone_width / 2.0));
+  asb->set_float_limits(3.14159/2.0, min_cone_angle);
+
+  new GLUI_Checkbox(roll_cone, "Wireframe", &wireframe, 1, control_cb);
+  GLUI_Spinner *spinner = 
+    new GLUI_Spinner(roll_cone, "Segments:", &segments);
+  spinner->set_int_limits(3, 60);
+  spinner->set_alignment(GLUI_ALIGN_RIGHT);
+
   /******** Add some controls for plane ********/
 
   GLUI_Rollout *roll_plane = new GLUI_Rollout(glui, "Plane", false);
@@ -574,29 +592,31 @@ int main(int argc, char* argv[])
                            &plane_color[3],PLANE_COLOR_ID,control_cb);
   psb->set_float_limits(0,1);
 
-  /******** Add some controls for cone ********/
+#if 0
+  obj_panel = new GLUI_Rollout(glui, "Properties", false);
 
-  GLUI_Rollout *roll_cone = new GLUI_Rollout(glui, "Cone", false);
-  new GLUI_Checkbox(roll_cone, "Draw cone", &show_cone);
+  /***** Control for object params *****/
+  GLUI_Spinner *scale_spinner = 
+    new GLUI_Spinner(obj_panel, "Scale:", &scale);
+  scale_spinner->set_float_limits(.2f, 4.0);
+  scale_spinner->set_alignment(GLUI_ALIGN_RIGHT);
+#endif
 
-  GLUI_Panel *angle_panel = new GLUI_Panel(roll_cone, "Angle (0 - 45)");
-  GLUI_Scrollbar *asb;
-  asb = new GLUI_Scrollbar(angle_panel, "Angle",GLUI_SCROLL_HORIZONTAL,
-                           &cone_angle,CONE_ANGLE_ID,control_cb);
-  float min_cone_angle = atan(cone_height / (max_cone_width / 2.0));
-  asb->set_float_limits(3.14159/2.0, min_cone_angle);
+  /*** Add another rollout ***/
+  GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", false);
+  new GLUI_Checkbox(options, "Draw axes", &show_axes);
 
   /******** Add some controls for lights ********/
 
-  GLUI_Rollout *roll_lights = new GLUI_Rollout(glui, "Lights", false);
+  GLUI_Rollout *roll_lights = new GLUI_Rollout(options, "Lights", false);
 
-  GLUI_Panel *light0 = new GLUI_Panel(roll_lights, "Light 1");
-  GLUI_Panel *light1 = new GLUI_Panel(roll_lights, "Light 2");
+  GLUI_Panel *light0 = new GLUI_Panel(options, "Light 1");
+  GLUI_Panel *light1 = new GLUI_Panel(options, "Light 2");
 
   new GLUI_Checkbox(light0, "Enabled", &light0_enabled,
                      LIGHT0_ENABLED_ID, control_cb);
-  light0_spinner = 
-    new GLUI_Spinner(light0, "Intensity:", 
+  light0_spinner =
+    new GLUI_Spinner(light0, "Intensity:",
                       &light0_intensity, LIGHT0_INTENSITY_ID,
                       control_cb);
   light0_spinner->set_float_limits(0.0, 1.0);
@@ -612,7 +632,7 @@ int main(int argc, char* argv[])
   sb->set_float_limits(0,1);
   new GLUI_Checkbox(light1, "Enabled", &light1_enabled,
                      LIGHT1_ENABLED_ID, control_cb);
-  light1_spinner = 
+  light1_spinner =
     new GLUI_Spinner(light1, "Intensity:",
                       &light1_intensity, LIGHT1_INTENSITY_ID,
                       control_cb);
@@ -627,29 +647,8 @@ int main(int argc, char* argv[])
                            &light1_diffuse[2],LIGHT1_INTENSITY_ID,control_cb);
   sb->set_float_limits(0,1);
 
-  obj_panel = new GLUI_Rollout(glui, "Properties", false);
-
-  /***** Control for object params *****/
-
-  new GLUI_Checkbox(obj_panel, "Wireframe", &wireframe, 1, control_cb);
-  GLUI_Spinner *spinner = 
-    new GLUI_Spinner(obj_panel, "Segments:", &segments);
-  spinner->set_int_limits(3, 60);
-  spinner->set_alignment(GLUI_ALIGN_RIGHT);
-
-  GLUI_Spinner *scale_spinner = 
-    new GLUI_Spinner(obj_panel, "Scale:", &scale);
-  scale_spinner->set_float_limits(.2f, 4.0);
-  scale_spinner->set_alignment(GLUI_ALIGN_RIGHT);
-
-  /*** Add another rollout ***/
-  GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", false);
-  new GLUI_Checkbox(options, "Draw axes", &show_axes);
   /*new GLUI_Checkbox(options, "Draw text", &show_text);*/
 
-  /****** A 'quit' button *****/
-  new GLUI_Button(glui, "Reset", 0,(GLUI_Update_CB)reset);
-  new GLUI_Button(glui, "Quit", 0,(GLUI_Update_CB)exit);
 
   /**** Link windows to GLUI, and register idle callback ******/
   
@@ -661,11 +660,13 @@ int main(int argc, char* argv[])
                                              GLUI_SUBWINDOW_BOTTOM);
   glui2->set_main_gfx_window(main_window);
 
-  view_rot = new GLUI_Rotation(glui2, "Both", view_rotate);
+  view_rot = new GLUI_Rotation(glui2, "Rotate", view_rotate);
   view_rot->set_spin(1.0);
   new GLUI_Column(glui2, false);
-  cone_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
-  cone_rot->set_spin(.98);
+  GLUI_Translation *trans_z = 
+    new GLUI_Translation(glui2, "Zoom", GLUI_TRANSLATION_Z, &obj_pos[2]);
+  trans_z->set_speed(.005);
+
   new GLUI_Column(glui2, false);
   pln_rot = new GLUI_Rotation(glui2, "Plane", plane_rotate);
   pln_rot->set_spin(.98);
@@ -679,24 +680,30 @@ int main(int argc, char* argv[])
     new GLUI_Translation(glui2, "Plane Z", GLUI_TRANSLATION_Z, &plane_pos[2]);
   ptrans_z->set_speed(.005);
   new GLUI_Column(glui2, false);
+
+  new GLUI_Column(glui2, false);
+  cone_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
+  cone_rot->set_spin(.98);
+
+  new GLUI_Column(glui2, false);
+  new GLUI_Button(glui2, "Reset", 0,(GLUI_Update_CB)reset);
+  new GLUI_Button(glui2, "Quit", 0,(GLUI_Update_CB)exit);
+
+
   //lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation);
   //lights_rot->set_spin(.82);
-  new GLUI_Column(glui2, false);
-  GLUI_Translation *trans_xy = 
-    new GLUI_Translation(glui2, "Both XY", GLUI_TRANSLATION_XY, obj_pos);
-  trans_xy->set_speed(.005);
-  new GLUI_Column(glui2, false);
-  GLUI_Translation *trans_x = 
-    new GLUI_Translation(glui2, "Both X", GLUI_TRANSLATION_X, obj_pos);
-  trans_x->set_speed(.005);
-  new GLUI_Column(glui2, false);
-  GLUI_Translation *trans_y = 
-    new GLUI_Translation(glui2, "Both Y", GLUI_TRANSLATION_Y, &obj_pos[1]);
-  trans_y->set_speed(.005);
-  new GLUI_Column(glui2, false);
-  GLUI_Translation *trans_z = 
-    new GLUI_Translation(glui2, "Both Z", GLUI_TRANSLATION_Z, &obj_pos[2]);
-  trans_z->set_speed(.005);
+  //new GLUI_Column(glui2, false);
+  //GLUI_Translation *trans_xy = 
+  //  new GLUI_Translation(glui2, "Both XY", GLUI_TRANSLATION_XY, obj_pos);
+  //trans_xy->set_speed(.005);
+  //new GLUI_Column(glui2, false);
+  //GLUI_Translation *trans_x = 
+  //  new GLUI_Translation(glui2, "Both X", GLUI_TRANSLATION_X, obj_pos);
+  //trans_x->set_speed(.005);
+  //new GLUI_Column(glui2, false);
+  //GLUI_Translation *trans_y = 
+  //  new GLUI_Translation(glui2, "Both Y", GLUI_TRANSLATION_Y, &obj_pos[1]);
+  //trans_y->set_speed(.005);
 
 #if 0
   /**** We register the idle callback with GLUI, *not* with GLUT ****/
