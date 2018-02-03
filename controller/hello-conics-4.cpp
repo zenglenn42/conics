@@ -310,6 +310,9 @@ void draw_axes(float scale)
   glVertex3f(0.0, 0.0, 0.0);  glVertex3f(1.0, 0.0, 0.0); /* X axis      */
 
   glColor3f(0.0, 1.0, 0.0);
+  glVertex3f(.05f, .8f, 0.0); glVertex3f(0.25f, 1.0, 0.0); /* Letter Y */
+  glVertex3f(0.137f, 0.9f, 0.0); glVertex3f(0.05, 1.0f, 0.0);
+
   glVertex3f(0.0, 0.0, 0.0);  glVertex3f(0.0, 1.0, 0.0); /* Y axis      */
 
   glColor3f(0.0, 0.0, 1.0);
