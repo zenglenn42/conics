@@ -14,7 +14,8 @@
         attempt at transparency
         pre-configured conic buttons (parabola, elipse, hyperbola)
         Y and Z axis labels
-        add transparency for cone
+        streamline the ui a bit more
+        jettison cone transparency, not very useful
 	
   -----------------------------------------------------------------------
 
@@ -47,7 +48,6 @@ float cone_height = 0.4;
 float max_cone_width = cone_height;
 GLfloat cone_angle = atan(cone_height/cone_width);
 
-float cone_transparency = 1.0;
 float plane_transparency = 0.7; // opaque = 1.0, invisible = 0.0
 GLfloat mat_transparent_plane[] = { 0.0, 0.5, 1.0, plane_transparency };
 GLfloat mat_emission_plane[] = { 0.7, 0.7, 0.7, 0.6 };
@@ -491,7 +491,6 @@ int reset() {
     plane_transparency = 0.7; // opaque = 1.0, invisible = 0.0
     plane_color[3] = plane_transparency;
 
-    cone_transparency = 1.0;
     cone_width = 0.4;
     cone_angle = atan(cone_height / cone_width);
 
@@ -568,50 +567,6 @@ int main(int argc, char* argv[])
   new GLUI_Button(roll_conics, "circle", CIRCLE_ID, control_cb);
   new GLUI_Button(roll_conics, "hyperbola", HYPERBOLA_ID, control_cb);
 
-  /******** Add some controls for cone ********/
-
-  GLUI_Rollout *roll_cone = new GLUI_Rollout(glui, "Cone", false);
-  new GLUI_Checkbox(roll_cone, "Draw cone", &show_cone);
-
-  GLUI_Panel *angle_panel = new GLUI_Panel(roll_cone, "Angle (0 - 45)");
-  GLUI_Scrollbar *asb;
-  asb = new GLUI_Scrollbar(angle_panel, "Angle",GLUI_SCROLL_HORIZONTAL,
-                           &cone_angle,CONE_ANGLE_ID,control_cb);
-  float min_cone_angle = atan(cone_height / (max_cone_width / 2.0));
-  asb->set_float_limits(3.14159/2.0, min_cone_angle);
-
-  new GLUI_Checkbox(roll_cone, "Wireframe", &wireframe, 1, control_cb);
-  GLUI_Spinner *spinner = 
-    new GLUI_Spinner(roll_cone, "Segments:", &segments);
-  spinner->set_int_limits(3, 60);
-  spinner->set_alignment(GLUI_ALIGN_RIGHT);
-  GLUI_Panel *cone_glui_panel = new GLUI_Panel(roll_cone, "Transparency");
-  GLUI_Scrollbar *psb3;
-  psb3 = new GLUI_Scrollbar(cone_glui_panel, "Alpha",GLUI_SCROLL_HORIZONTAL,
-                           &cone_transparency,CONE_TRANSPARENCY_ID,control_cb);
-  psb3->set_float_limits(0,1);
-
-  /******** Add some controls for plane ********/
-
-  GLUI_Rollout *roll_plane = new GLUI_Rollout(glui, "Plane", false);
-  new GLUI_Checkbox(roll_plane, "Draw plane", &show_plane);
-
-  GLUI_Panel *color_panel = new GLUI_Panel(roll_plane, "Color (RGB)");
-  GLUI_Scrollbar *psb;
-  psb = new GLUI_Scrollbar(color_panel, "Red",GLUI_SCROLL_HORIZONTAL,
-                           &plane_color[0],PLANE_COLOR_ID,control_cb);
-  psb->set_float_limits(0,1);
-  psb = new GLUI_Scrollbar(color_panel, "Green",GLUI_SCROLL_HORIZONTAL,
-                           &plane_color[1],PLANE_COLOR_ID,control_cb);
-  psb->set_float_limits(0,1);
-  psb = new GLUI_Scrollbar(color_panel, "Blue",GLUI_SCROLL_HORIZONTAL,
-                           &plane_color[2],PLANE_COLOR_ID,control_cb);
-  psb->set_float_limits(0,1);
-  GLUI_Panel *color_panel_2 = new GLUI_Panel(roll_plane, "Transparency");
-  GLUI_Scrollbar *psb2;
-  psb2 = new GLUI_Scrollbar(color_panel_2, "Alpha",GLUI_SCROLL_HORIZONTAL,
-                           &plane_color[3],PLANE_COLOR_ID,control_cb);
-  psb->set_float_limits(0,1);
 
 #if 0
   obj_panel = new GLUI_Rollout(glui, "Properties", false);
@@ -627,15 +582,50 @@ int main(int argc, char* argv[])
   GLUI_Rollout *options = new GLUI_Rollout(glui, "Options", false);
   new GLUI_Checkbox(options, "Draw axes", &show_axes);
 
-  new GLUI_Button(glui, "Quit", 0,(GLUI_Update_CB)exit);
+  //new GLUI_Button(glui, "Quit", 0,(GLUI_Update_CB)exit);
+
+  /******** Add some controls for cone ********/
+
+  GLUI_Rollout *roll_cone = new GLUI_Rollout(options, "Cone", false);
+  new GLUI_Checkbox(roll_cone, "Draw cone", &show_cone);
+
+  GLUI_Panel *angle_panel = new GLUI_Panel(roll_cone, "Angle (0 - 45)");
+  GLUI_Scrollbar *asb;
+  asb = new GLUI_Scrollbar(angle_panel, "Angle",GLUI_SCROLL_HORIZONTAL,
+                           &cone_angle,CONE_ANGLE_ID,control_cb);
+  float min_cone_angle = atan(cone_height / (max_cone_width / 2.0));
+  asb->set_float_limits(3.14159/2.0, min_cone_angle);
+
+  new GLUI_Checkbox(roll_cone, "Wireframe", &wireframe, 1, control_cb);
+  GLUI_Spinner *spinner = 
+    new GLUI_Spinner(roll_cone, "Segments:", &segments);
+  spinner->set_int_limits(3, 60);
+  spinner->set_alignment(GLUI_ALIGN_RIGHT);
+
+  /******** Add some controls for plane ********/
+
+  GLUI_Rollout *roll_plane = new GLUI_Rollout(options, "Plane", false);
+  new GLUI_Checkbox(roll_plane, "Draw plane", &show_plane);
+
+  GLUI_Panel *color_panel = new GLUI_Panel(roll_plane, "Color (RGB)");
+  GLUI_Scrollbar *psb;
+  psb = new GLUI_Scrollbar(color_panel, "Red",GLUI_SCROLL_HORIZONTAL,
+                           &plane_color[0],PLANE_COLOR_ID,control_cb);
+  psb->set_float_limits(0,1);
+  psb = new GLUI_Scrollbar(color_panel, "Green",GLUI_SCROLL_HORIZONTAL,
+                           &plane_color[1],PLANE_COLOR_ID,control_cb);
+  psb->set_float_limits(0,1);
+  psb = new GLUI_Scrollbar(color_panel, "Blue",GLUI_SCROLL_HORIZONTAL,
+                           &plane_color[2],PLANE_COLOR_ID,control_cb);
+  psb->set_float_limits(0,1);
 
 
   /******** Add some controls for lights ********/
 
   GLUI_Rollout *roll_lights = new GLUI_Rollout(options, "Lights", false);
 
-  GLUI_Panel *light0 = new GLUI_Panel(options, "Light 1");
-  GLUI_Panel *light1 = new GLUI_Panel(options, "Light 2");
+  GLUI_Panel *light0 = new GLUI_Panel(roll_lights, "Light 1");
+  GLUI_Panel *light1 = new GLUI_Panel(roll_lights, "Light 2");
 
   new GLUI_Checkbox(light0, "Enabled", &light0_enabled,
                      LIGHT0_ENABLED_ID, control_cb);
@@ -704,11 +694,20 @@ int main(int argc, char* argv[])
     new GLUI_Translation(glui2, "Plane Z", GLUI_TRANSLATION_Z, &plane_pos[2]);
   ptrans_z->set_speed(.005);
   new GLUI_Column(glui2, false);
+  GLUI_Panel *color_panel_2 = new GLUI_Panel(glui2, "Transparency");
+  GLUI_Scrollbar *psb2;
+  psb2 = new GLUI_Scrollbar(color_panel_2, "Alpha",GLUI_SCROLL_HORIZONTAL,
+                           &plane_color[3],PLANE_COLOR_ID,control_cb);
+  psb2->set_alignment(GLUI_ALIGN_LEFT);
+  psb2->set_float_limits(0,1);
+  GLUI_Button *gb = new GLUI_Button(glui2, "Reset", 0,(GLUI_Update_CB)reset);
 
   new GLUI_Column(glui2, false);
   cone_rot = new GLUI_Rotation(glui2, "Cone", cone_rotate);
   cone_rot->set_spin(.98);
 
+#if 0
+  new GLUI_Column(glui2, false);
   GLUI_Column *gc = new GLUI_Column(glui2, false);
   GLUI_Button *gb = new GLUI_Button(glui2, "", 0,(GLUI_Update_CB)reset);
   int dummy;
@@ -716,9 +715,9 @@ int main(int argc, char* argv[])
   gb->set_alignment(GLUI_ALIGN_LEFT);
   gb->set_w(col_h);
   gb->set_h(col_h);
-  
   GLUI_String gstr = "  Reset  "; // TODO: find better way to center text under button
   GLUI_StaticText *gst = new GLUI_StaticText(glui2, gstr);
+#endif
 
   //lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation);
   //lights_rot->set_spin(.82);

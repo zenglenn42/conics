@@ -100,4 +100,4 @@ Get transparency slider working for plane.
 
 Add pre-set conic section buttons and strip the UI down to essentials.
 
-![alt tag](controller/img/hello-conics-4.png)
+![alt tag](controller/img/hello-conics-5.png)
