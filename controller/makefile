@@ -37,6 +37,7 @@ PROGRAMS += $(BUILD_DIR)/hello-conics-1
 PROGRAMS += $(BUILD_DIR)/hello-conics-2
 PROGRAMS += $(BUILD_DIR)/hello-conics-3
 PROGRAMS += $(BUILD_DIR)/hello-conics-4
+PROGRAMS += $(BUILD_DIR)/hello-conics-5
 
 BUILD_DIR = build
 GENERATED_MAKEFILE = $(BUILD_DIR)/Makefile
