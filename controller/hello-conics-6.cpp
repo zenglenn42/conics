@@ -13,17 +13,17 @@
         slider for cone generator angle
         attempt at transparency
         pre-configured conic buttons (parabola, elipse, hyperbola)
-        Y and Z axis labels
+        add Y and Z axis labels
         streamline the ui a bit more
         jettison cone transparency, not very useful
+        add arrow-heads to axes
 	
   -----------------------------------------------------------------------
 
-  This is an altered version of code written by:
+  The glui layout is descended from original example code written by:
+  7/10/98 Paul Rademacher (rademach@cs.unc.edu) (GLUI toolkit ver 2.37)
 
-  7/10/98 Paul Rademacher (rademach@cs.unc.edu)
-
-  in the GLUI user interface toolkit (ver 2.37).
+  Copyright (☯) 2018 Glenn Streiff
 
 ****************************************************************************/
 
@@ -45,7 +45,7 @@ GLfloat g_cone_width = DFLT_CONE_WIDTH;
 GLfloat g_cone_height = 0.4;
 GLfloat g_cone_angle = atan(g_cone_height/g_cone_width);
 
-static const GLfloat DFLT_PLANE_TRANSPARENCY = 0.7; // opaque = 1.0, invisible = 0.0
+static const GLfloat DFLT_PLANE_TRANSPARENCY = 0.5; // opaque = 1.0, invisible = 0.0
 GLfloat g_plane_transparency = DFLT_PLANE_TRANSPARENCY; 
 GLfloat g_plane_material[] = {0.0, 0.5, 1.0, g_plane_transparency};
 
@@ -84,7 +84,7 @@ GLUI *g_glui_win, *g_glui_win2;
 GLUI_Spinner *g_light0_spinner, *g_light1_spinner;
 
 GLfloat g_view_scale = 1.25f;
-GLfloat g_plane_scale = 0.52f;
+GLfloat g_plane_scale = 0.55f;
 GLfloat g_plane_color[] = {1.0, 1.0, 1.0, g_plane_transparency};
 
 /********** User IDs for callbacks ******************/
@@ -323,7 +323,7 @@ void draw_axes(GLfloat scale)
   glScalef(scale, scale, scale);
 
   glBegin(GL_LINES);
-    glColor3f(1.0, 0.0, 0.0);
+    glColor3f(0.8, 0.0, 0.0);
     /* Letter X */
     glVertex3f(0.8f, 0.05f, 0.0); glVertex3f(1.0, 0.25f, 0.0); 
     glVertex3f(0.8f, 0.25f, 0.0); glVertex3f(1.0, 0.05f, 0.0);
@@ -348,7 +348,31 @@ void draw_axes(GLfloat scale)
 
     /* Z axis */
     glVertex3f(0.0, 0.0, 0.0); glVertex3f(0.0, 0.0, 1.0); 
+
   glEnd();
+
+  /* X axis arrow */
+  glPushMatrix();
+    glColor3f(0.8, 0.0, 0.0);
+    glTranslatef(1.0, 0.0, 0.0);
+    glRotatef(90.0, 0.0, 1.0, 0.0);
+    glutSolidCone(0.02, 0.10, 10, 10);
+  glPopMatrix();
+
+  /* Y axis arrow */
+  glPushMatrix();
+    glColor3f(0.0, 1.0, 0.0);
+    glTranslatef(0.0, 1.0, 0.0);
+    glRotatef(-90.0, 1.0, 0.0, 0.0);
+    glutSolidCone(0.02, 0.10, 10, 10);
+  glPopMatrix();
+
+  /* Z axis arrow */
+  glPushMatrix();
+    glColor3f(0.0, 0.0, 1.0);
+    glTranslatef(0.0, 0.0, 1.0);
+    glutSolidCone(0.02, 0.10, 10, 10);
+  glPopMatrix();
 
   glPopMatrix();
   glEnable(GL_LIGHTING);
@@ -405,7 +429,7 @@ void myGlutDisplay()
     glMultMatrixf(g_cone_rotate);
     glPushMatrix();
       glRotatef(-90.0, 1.0, 0.0, 0.0);
-      glTranslatef(0.0, 0.0, -g_cone_width);
+      glTranslatef(0.0, 0.0, -DFLT_CONE_WIDTH);
       if (g_live_wireframe && g_show_cone)
         glutWireCone(g_cone_width, g_cone_height, g_live_slices, g_live_segments);
       else if (g_show_cone)
@@ -414,7 +438,7 @@ void myGlutDisplay()
 
     glPushMatrix();
       glRotatef(90.0, 1.0, 0.0, 0.0);
-      glTranslatef(0.0, 0.0, -g_cone_width);
+      glTranslatef(0.0, 0.0, -DFLT_CONE_WIDTH);
       if (g_live_wireframe && g_show_cone)
         glutWireCone(g_cone_width, g_cone_height, g_live_slices, g_live_segments);
       else if (g_show_cone)
@@ -650,4 +674,3 @@ int main(int argc, char* argv[])
 
   return EXIT_SUCCESS;
 }
-
