@@ -105,3 +105,4 @@ Add pre-set conic section buttons and strip the UI down to essentials.
 Add a clip plane for conic cross-section.
 
 ![alt tag](controller/img/hello-conics-7.png)
+
