@@ -106,11 +106,11 @@ Add a clip plane for conic cross-section.
 
 ![alt tag](controller/img/hello-conics-7.png)
 
-So I have something at this point I can at least demo.  But the code needs attention:
+So I have something I can demo.  But the code needs attention:
 
 * It's mainly old-school C with global variables running around. The code is already prone to side-effects and will be difficult to evolve and I know I'm missing out on the virtues of object oriented languages.
 
-* The windowing and user interface libraries were expedient choices that offered some helpful example code, but they're a bit outdated. It'd be nice to use something more modern and ready for mobile.  I /am/ liking cmake, though, and it's portable goodness.
+* The windowing and user interface libraries were expedient choices that offered some helpful example code, but they're a bit outdated. It'd be nice to use something more modern and ready for mobile.  I /am/ liking cmake, though, and its portable goodness.
 
 * My primary demo app, hello-conics-7, is structured as one file. I should really think about patterns a bit and split things out across multiple files.
 
@@ -122,4 +122,4 @@ Decisions:
 
 The other approach would be webgl and js.  I guess that would take me down the webapp / react-native path for mobile.  But I've got some momentum with C/C++ and want to wrangle in that playground awhile.
 
-I've found a [nice tutorial](https://www.youtube.com/watch?v=ftiKrP3gW3k) that looks about my speed and should meet my needs for the above.
+I've found a [nice tutorial](https://www.youtube.com/watch?v=ftiKrP3gW3k) that looks about my speed and should meet my needs for the above.  So no new eye-candy for awhile.
