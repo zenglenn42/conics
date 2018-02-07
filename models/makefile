@@ -11,6 +11,7 @@
 
 PROGRAMS  = parabola
 PROGRAMS += parabola-bez
+PROGRAMS += plane
 
 CPPFLAGS = -std=c++14
 #-Wno-c++11-extensions

@@ -18,6 +18,9 @@
 # /System/Library/Frameworks/GLUT.framework
 #    GLUT 3.6.9
 #
+# 3rd party headers are generally under:
+#    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/System/Library/Frameworks
+#
 # ToDo
 # -----------------
 # Update build so changes to PROGRAMS drives updates to 
@@ -39,10 +42,13 @@ PROGRAMS += $(BUILD_DIR)/hello-conics-3
 PROGRAMS += $(BUILD_DIR)/hello-conics-4
 PROGRAMS += $(BUILD_DIR)/hello-conics-5
 PROGRAMS += $(BUILD_DIR)/hello-conics-6
+PROGRAMS += $(BUILD_DIR)/hello-conics-7
 
 BUILD_DIR = build
 GENERATED_MAKEFILE = $(BUILD_DIR)/Makefile
 CMAKEFILE = CMakeLists.txt
+
+debug_FLAGS = -print-search-dirs
 
 #-----------------------------------------------------------------
 # Tools isolation.
@@ -53,6 +59,9 @@ CMAKE = cmake
 # Build targets, dependencies, and recipes.
 #-----------------------------------------------------------------
 all: $(GENERATED_MAKEFILE) $(PROGRAMS)
+
+debug:
+	c++ $(debugFLAGS) hello-spinner.cpp
 
 $(PROGRAMS): $(BUILD_DIR)/% : %.cpp | $(GENERATED_MAKEFILE)
 	@echo building $@ from $?

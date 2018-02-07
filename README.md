@@ -101,3 +101,7 @@ Get transparency slider working for plane.
 Add pre-set conic section buttons and strip the UI down to essentials.
 
 ![alt tag](controller/img/hello-conics-6.png)
+
+Add a clip plane for conic cross-section.
+
+![alt tag](controller/img/hello-conics-7.png)
