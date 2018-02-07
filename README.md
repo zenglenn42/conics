@@ -122,4 +122,4 @@ Decisions:
 
 The other approach would be webgl and js.  I guess that would take me down the webapp / react-native path for mobile.  But I've got some momentum with C/C++ and want to wrangle in that playground awhile.
 
-I've found a [nice tutorial](https://www.youtube.com/watch?v=ftiKrP3gW3k) that looks about my speed and should meet my needs for the above.  So no new eye-candy for awhile.
+I've found a [nice tutorial](https://www.youtube.com/watch?v=ftiKrP3gW3k) that looks about my speed and should meet my needs for the above.  So no new eye-candy for a while.
