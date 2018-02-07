@@ -42,6 +42,8 @@
 
 void control_cb(GLint control);
 GLUI_Checkbox *g_clip_plane_checkbox;
+GLUI_Scrollbar * g_scroll_transparency;
+
 GLfloat g_arcball_radius = 1.35;
 GLfloat g_xy_aspect;
 
@@ -223,7 +225,7 @@ GLint reset() {
     g_plane_color[2] = 1.0;
     g_plane_transparency = DFLT_PLANE_TRANSPARENCY; // opaque = 1.0, invisible = 0.0
     g_plane_color[3] = g_plane_transparency;
-
+    g_scroll_transparency->set_float_val(g_plane_color[3]);
     g_cone_width = DFLT_CONE_WIDTH;
     g_cone_angle = atan(g_cone_height / g_cone_width);
 
@@ -760,11 +762,10 @@ int main(int argc, char* argv[])
   ptrans_z->set_speed(.005);
   new GLUI_Column(g_glui_win2, false);
   GLUI_Panel *color_panel_2 = new GLUI_Panel(g_glui_win2, "Transparency");
-  GLUI_Scrollbar *psb2;
-  psb2 = new GLUI_Scrollbar(color_panel_2, "Alpha",GLUI_SCROLL_HORIZONTAL,
+  g_scroll_transparency = new GLUI_Scrollbar(color_panel_2, "Alpha",GLUI_SCROLL_HORIZONTAL,
                            &g_plane_color[3],PLANE_COLOR_ID,control_cb);
-  psb2->set_alignment(GLUI_ALIGN_LEFT);
-  psb2->set_float_limits(0,1);
+  g_scroll_transparency->set_alignment(GLUI_ALIGN_LEFT);
+  g_scroll_transparency->set_float_limits(0,1);
   GLUI_Button *gb = new GLUI_Button(g_glui_win2, "Reset", 0,(GLUI_Update_CB)reset);
 
   new GLUI_Column(g_glui_win2, false);
