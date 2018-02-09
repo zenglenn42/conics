@@ -126,4 +126,6 @@ These look helpful:
 
 [C++](https://www.youtube.com/playlist?list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb&disable_polymer=true)
 
+[Abstracting OpenGL into C++ classes](https://www.youtube.com/watch?v=bTHqmzjm2UI)
+
 [Modern OpenGL with C++](https://www.youtube.com/watch?v=ftiKrP3gW3k)
