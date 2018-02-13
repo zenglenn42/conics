@@ -3,7 +3,7 @@
 Welcome.  These are code sketches relating to conic sections and OpenGL.  It's all very humble and intentionally non-exemplary.  I just want to get some ideas out there that have been on my mind for a long time.  We can do better with our math textbooks, don't you think?
 
 
-It would be nice to have a couple different views on the same thing.  Maybe 2D in one window and 3D in the other.  The follow is a stripped down version of some [nice code](http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html) from JH Kim:
+It would be nice to have a couple different views on the same thing.  Maybe 2D in one window and 3D in the other.  The following is a stripped down version of some [nice code](http://study.marearts.com/2012/01/sample-source-to-make-subwindow-in.html) from JH Kim:
 
 ![alt tag](view/img/hello-subWindows.png)
 
