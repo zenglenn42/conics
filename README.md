@@ -129,3 +129,5 @@ These look helpful:
 [Abstracting OpenGL into C++ classes](https://www.youtube.com/watch?v=bTHqmzjm2UI)
 
 [Modern OpenGL with C++](https://www.youtube.com/watch?v=ftiKrP3gW3k)
+
+The action has moved [here](https://github.com/zenglenn42/opengl-tutorial-tbb) for the moment.
